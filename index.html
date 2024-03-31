@@ -6,50 +6,70 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Progetto Computer Graphics 2024</title>
   <link rel="stylesheet" href="css/index.css">
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
 <body>
-  <div class="container">
+  <div class="flex flex-1 flex-col ">
     <audio id="backgroundAudio" src="airplane.mp3" loop></audio>
-    <header>
-      <h1>Airplane Navigator</h1>
+    <header class="flex flex-1 justify-center p-5">
+      <div class="text-3xl font-bold">Airplane Navigator</div>
     </header>
-    <section class="options">
-      <h2>Terrain Generator Options</h2>
-      <div class="input-group">
+    <div class="grid grid-rows-2 grid-flow-col gap-4">
+      <div>
         <label for="terrain_size">Terrain size:</label>
-        <input type="text" id="terrain_size" value="12.0">
+        <input class="rounded  p-1 border border-sky-300" type="text" id="terrain_size" value="12.0">
       </div>
-      <div class="input-group">
-        <label for="size_x"># Noise Samples X:</label>
-        <input type="text" id="size_x" value="400">
-        <label for="size_y">Y:</label>
-        <input type="text" id="size_y" value="400">
+      <div>
+        <label for="size_x">Noise Samples X:</label>
+        <input class="rounded  p-1 border border-sky-300" type="text" id="size_x" value="400">
       </div>
-      <div class="input-group">
-        <label for="noise_size_x"># Noise Data Points X:</label>
-        <input type="text" id="noise_size_x" value="100">
-        <label for="noise_size_y">Y:</label>
-        <input type="text" id="noise_size_y" value="100">
+      <div>
+        <label for="size_y">Noise Samples Y:</label>
+        <input class="rounded-lg p-1 border border-sky-300" type="text" id="size_y" value="400">
       </div>
-      <div class="input-group">
-        <label for="max_height">Max Mountain Height:</label>
-        <input type="text" id="max_height" value="1.5">
+      <div>
+        <label for="noise_size_x">Noise Data Points X:</label>
+        <input class="rounded-lg p-1 border border-sky-300" type="text" id="noise_size_x" value="100">
       </div>
-    </section>
-    <section class="graphics-options">
-      <h2>Graphics Options</h2>
-      <div class="input-group">
+      <div>
+        <label for="noise_size_y">Noise Data Points Y:</label>
+        <input class="rounded  p-1 border border-sky-300" type="text" id="noise_size_y" value="100">
+      </div>
+      <div>
+        <label for="max_height">Mountain Height:</label>
+        <input class="rounded  p-1 border border-sky-300" type="text" id="max_height" value="1.5">
+      </div>
+    </div>
+
+    <section class="p-5 flex flex-1 items-center flex-col">
+      <div class="flex flex-1 gap-4">
         <label for="ufo_mode">UFO Mode:</label>
-        <input type="checkbox" id="ufo_mode">
+        <input class="rounded" type="checkbox" id="ufo_mode">
+        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" id="audioControl">Toggle
+          Audio</button>
       </div>
-      <canvas id="mp2-canvas" width="900" height="600"></canvas>
+
     </section>
-    <section class="keys">
-      <h2>Keys</h2>
-      <p>Movement: A: roll left, D: roll right, W: pitch down, S: pitch up</p>
-      <p>Velocity: Use + and - to change velocity.</p>
-    </section>
+    <div class="flex flex-1 flex-row items-center flex-wrap">
+
+      <div class=" flex flex-1 p-5 justify-center">
+        <canvas id="mp2-canvas" width="700" height="600"></canvas>
+      </div>
+      <div id="directionalButtons" class="flex flex-col ">
+        <div class="flex">
+          <div class="arrow-key plus" data-key="187"></div>
+          <div class="arrow-key minus" data-key="189"></div>
+        </div>
+        <div class="arrow-key-container ">
+          <div class="arrow-key up" data-key="87"></div><br>
+          <div class="arrow-key left" data-key="65"></div>
+          <div class="arrow-key down" data-key="83"></div>
+          <div class="arrow-key right" data-key="68"></div>
+        </div>
+      </div>
+
+    </div>
   </div>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
   <script src="lib/webgl-utils.js"></script>
@@ -106,6 +126,20 @@
             vLightWeight = uAmbientColor + uDirectionalColor * directionalLightWeight;
         }
     </script>
+  <script>
+    var audio = document.getElementById("backgroundAudio");
+    var audioControlButton = document.getElementById("audioControl");
+
+    audioControlButton.addEventListener("click", function () {
+      if (audio.paused) {
+        audio.play();
+        audioControlButton.textContent = "Pause Audio";
+      } else {
+        audio.pause();
+        audioControlButton.textContent = "Play Audio";
+      }
+    });
+  </script>
 </body>
 
 </html>

@@ -35,11 +35,18 @@ $('#ufo_mode').change(function() {
 
 // Funzione per gestire gli eventi di pressione dei tasti
 function handleKeyDown(e) {
-  var key = e.keyCode;
+  var key
+  if (typeof (e) != "number") {
+    key = e.keyCode;
+  } else {
+    key = e
+  }
+
   var right = vec3.create();
   vec3.cross(forward, up, right);
   var rotateMatrix = mat4.create();
   mat4.identity(rotateMatrix);
+  console.log(key)
   switch (key) {
     case 87: // w
       vertical_angular_velocity = -0.30;
@@ -64,6 +71,14 @@ function handleKeyDown(e) {
 
 // Bind degli eventi di pressione dei tasti
 $(document).bind('keydown', handleKeyDown);
+// Bind degli eventi di click per i bottoni delle frecce direzionali
+document.querySelectorAll(".arrow-key").forEach(function(button) {
+  button.addEventListener("click", function() {
+    var keyCode = parseInt(button.getAttribute("data-key"));
+    handleKeyDown(keyCode);
+  });
+});
+
 
 // Funzione per gestire gli eventi di rilascio dei tasti
 function handleKeyUp(e) {
