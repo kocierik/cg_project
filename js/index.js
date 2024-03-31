@@ -21,6 +21,10 @@ function initializeAndStart() {
   main(document.getElementById("mp2-canvas"));
 }
 
+var audio = document.getElementById("backgroundAudio");
+audio.play();
+
+
 // Bind dell'evento ready del documento per inizializzare e avviare il programma
 $(document).ready(initializeAndStart);
 
@@ -37,24 +41,24 @@ function handleKeyDown(e) {
   var rotateMatrix = mat4.create();
   mat4.identity(rotateMatrix);
   switch (key) {
-      case 87: // w
-          vertical_angular_velocity = -0.30;
-          break;
-      case 83: // s
-          vertical_angular_velocity = 0.30;
-          break;
-      case 65: // a
-          roll_angular_velocity = -0.30;
-          break;
-      case 68: // d
-          roll_angular_velocity = 0.30;
-          break;
-      case 189: // -
-          velocity -= 0.01;
-          break;
-      case 187: // +
-          velocity += 0.01;
-          break;
+    case 87: // w
+      vertical_angular_velocity = -0.30;
+      break;
+    case 83: // s
+      vertical_angular_velocity = 0.30;
+      break;
+    case 65: // a
+      roll_angular_velocity = -0.30;
+      break;
+    case 68: // d
+      roll_angular_velocity = 0.30;
+      break;
+    case 189: // -
+      velocity -= 0.01;
+      break;
+    case 187: // +
+      velocity += 0.01;
+      break;
   }
 }
 
@@ -65,10 +69,10 @@ $(document).bind('keydown', handleKeyDown);
 function handleKeyUp(e) {
   var key = e.keyCode;
   if (key == 83 || key == 87) { // s o w
-      vertical_angular_velocity = 0;
+    vertical_angular_velocity = 0;
   }
   if (key == 65 || key == 68) { // a o d
-      roll_angular_velocity = 0;
+    roll_angular_velocity = 0;
   }
 }
 
