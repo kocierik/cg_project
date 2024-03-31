@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MP2 - Flight Simulator</title>
+    <link rel="stylesheet" href="css/index.css">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>MP2 Flight Simulator</h1>
+        </header>
+        <section class="options">
+            <h2>Terrain Generator Options</h2>
+            <div class="input-group">
+                <label for="terrain_size">Terrain size:</label>
+                <input type="text" id="terrain_size" value="12.0">
+            </div>
+            <div class="input-group">
+                <label for="size_x"># Noise Samples X:</label>
+                <input type="text" id="size_x" value="400">
+                <label for="size_y">Y:</label>
+                <input type="text" id="size_y" value="400">
+            </div>
+            <div class="input-group">
+                <label for="noise_size_x"># Noise Data Points X:</label>
+                <input type="text" id="noise_size_x" value="100">
+                <label for="noise_size_y">Y:</label>
+                <input type="text" id="noise_size_y" value="100">
+            </div>
+            <div class="input-group">
+                <label for="max_height">Max Mountain Height:</label>
+                <input type="text" id="max_height" value="1.5">
+            </div>
+            <button id="start_sim">Start</button>
+        </section>
+        <section class="graphics-options">
+            <h2>Graphics Options</h2>
+            <div class="input-group">
+                <label for="ufo_mode">UFO Mode:</label>
+                <input type="checkbox" id="ufo_mode">
+            </div>
+            <canvas id="mp2-canvas" width="900" height="600"></canvas>
+        </section>
+        <section class="keys">
+            <h2>Keys</h2>
+            <p>Movement: A: roll left, D: roll right, W: pitch down, S: pitch up</p>
+            <p>Velocity: Use + and - to change velocity.</p>
+        </section>
+    </div>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="lib/webgl-utils.js"></script>
+    <script src="lib/gl-matrix-min.js"></script>
+    <script src="js/mountain.js"></script>
+    <script src="js/index.js"></script>
+
+    <script id="shader-fs" type="x-shader/x-fragment">
+        #ifdef GL_ES
+        precision highp float;
+        #endif
+
+        varying vec4 vColor;
+        varying vec3 vLightWeight;
+
+        void main(void) {
+            gl_FragColor = vec4(vec3(0.3, 0.3, 0.3) * vLightWeight, 1.0);
+        }
+    </script>
+    <script id="shader-vs" type="x-shader/x-vertex">	
+        attribute vec3 aVertexPosition;
+        attribute vec3 aVertexNormal;
+
+        uniform mat4 uPMatrix;
+        uniform mat3 uNMatrix;
+
+        uniform vec3 uAmbientColor;
+
+        uniform vec3 uLightingDirection;
+        uniform vec3 uDirectionalColor;
+
+        varying vec3 vLightWeight;
+
+        uniform vec3 uPosition;
+        uniform vec3 uForward;
+        uniform vec3 uUp;
+
+        void main(void) {
+			vec3 v = uForward;
+			vec3 u = uUp;
+			vec3 rprime = normalize(cross(v, u));
+			vec3 uprime = cross(rprime, v);
+			mat4 lookatTranslate = mat4(1.0);
+			lookatTranslate[3].xyz = -uPosition;
+			mat4 lookatRotate = mat4(rprime.x, uprime.x, -v.x, 0,
+									 rprime.y, uprime.y, -v.y, 0,
+									 rprime.z, uprime.z, -v.z, 0,
+									 0, 0, 0, 1);
+			mat4 lookatMatrix = lookatRotate * lookatTranslate;
+		
+			gl_Position = uPMatrix * lookatMatrix * vec4(aVertexPosition, 1.0);
+
+            float directionalLightWeight = max(dot(aVertexNormal, uLightingDirection), 0.0);
+            vLightWeight = uAmbientColor + uDirectionalColor * directionalLightWeight;
+        }
+    </script>
+</body>
+
+</html>
