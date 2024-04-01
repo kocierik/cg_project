@@ -24,6 +24,22 @@ function initializeAndStart() {
 var audio = document.getElementById("backgroundAudio");
 audio.play();
 
+var fullscreenButton = document.getElementById("fullscreenButton");
+
+// Aggiungi un listener per il click sul bottone
+fullscreenButton.addEventListener("click", function() {
+  var canvas = document.getElementById("mp2-canvas");
+
+  // Controlla se il browser supporta la modalità fullscreen
+  if (document.fullscreenEnabled) {
+    // Richiedi la modalità fullscreen per il canvas
+    canvas.requestFullscreen();
+  } else {
+    alert("Fullscreen non supportato dal browser.");
+  }
+});
+
+
 
 // Bind dell'evento ready del documento per inizializzare e avviare il programma
 $(document).ready(initializeAndStart);
@@ -293,7 +309,6 @@ function display() {
 
   // Set matrix uniforms and draw
   setMatrixUniforms();
-
   gl.drawArrays(gl.TRIANGLES, 0, mountainVertexPositionBuffer.numItems);
 }
 
