@@ -7,6 +7,7 @@
   <title>Progetto Computer Graphics 2024</title>
   <link rel="stylesheet" href="css/index.css">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://twgljs.org/dist/4.x/twgl-full.min.js"></script>
 </head>
 
 <body>
@@ -56,7 +57,7 @@
     <div class="flex flex-1 flex-row items-center flex-wrap">
 
       <div class=" flex flex-1 p-5 justify-center">
-        <canvas id="mp2-canvas" width="700" height="600"></canvas>
+        <canvas id="canvas" width="700" height="600"></canvas>
       </div>
       <div id="directionalButtons" class="flex flex-col ">
         <div class="flex">
@@ -74,13 +75,63 @@
     </div>
   </div>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="https://webglfundamentals.org/webgl/resources/m4.js"></script>
   <script src="lib/webgl-utils.js"></script>
   <script src="lib/gl-matrix-min.js"></script>
   <script src="js/mountain.js"></script>
-  <script src="js/cube.js"></script>
+  <!-- <script src="js/loadObj.js"></script> -->
+  <script src="./js/utils/handlekey.js"></script>
+  <script src="js/utils/fullscreenAudio.js"></script>
   <script src="js/index.js"></script>
+  <script src="js/spaceship.js"></script>
+  <!-- <script src="js/utils/room.js"></script> -->
+  <!-- <script src="js/utils/load_mesh.js"></script>
+  <script src="js/utils/mesh.js"></script> -->
+  <!-- <script src="js/utils/render.js"></script> -->
 
-  <script id="shader-fs" type="x-shader/x-fragment">
+
+  <script id="shader-fs-cube" type="x-shader/x-fragment">
+    precision mediump float;
+
+    varying vec3 v_normal;
+  
+    uniform vec4 u_diffuse;
+    uniform vec3 u_lightDirection;
+  
+    void main () {
+      vec3 normal = normalize(v_normal);
+      float fakeLight = dot(u_lightDirection, normal) * .5 + .5;
+      gl_FragColor = vec4(u_diffuse.rgb * fakeLight, u_diffuse.a);
+    }
+  </script>
+  <script id="shader-vs-cube" type="x-shader/x-vertex">
+    attribute vec4 a_position;
+  attribute vec3 a_normal;
+
+  uniform mat4 u_projection;
+  uniform mat4 u_view;
+  uniform mat4 u_world;
+
+  varying vec3 v_normal;
+
+  void main() {
+    gl_Position = u_projection * u_view * u_world * a_position;
+    v_normal = mat3(u_world) * a_normal;
+  }
+  </script>
+<script id="shader-fs-spaceship" type="x-shader/x-fragment">
+  #ifdef GL_ES
+  precision highp float;
+  #endif
+  attribute vec4 aVertexColor;
+  varying vec4 vColor;
+  varying vec3 vLightWeight;
+
+  void main(void) {
+      gl_FragColor = vec4(vec3(0.8, 0.6, 0.3) * vLightWeight, 1.0);
+  }
+</script>
+    <script id="shader-fs-mountain" type="x-shader/x-fragment">
         #ifdef GL_ES
         precision highp float;
         #endif
@@ -92,7 +143,7 @@
             gl_FragColor = vec4(vec3(0.3, 0.3, 0.3) * vLightWeight, 1.0);
         }
     </script>
-  <script id="shader-vs" type="x-shader/x-vertex">
+  <script id="shader-vs-mountain" type="x-shader/x-vertex">
         attribute vec3 aVertexPosition;
         attribute vec3 aVertexNormal;
 
