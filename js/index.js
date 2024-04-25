@@ -5,10 +5,11 @@ var noise_size_x;
 var noise_size_y;
 var max_height;
 var ufo_mode = false;
+var spaceshipGeometries = []; // Array per memorizzare le geometrie dello spaceship
 
 // Funzione per inizializzare e avviare il programma
 function initializeAndStart() {
-  // Get option values
+  // Ottieni i valori delle opzioni
   terrain_size = parseFloat($('#terrain_size').val());
   size_x = parseFloat($('#size_x').val());
   size_y = parseFloat($('#size_y').val());
@@ -18,107 +19,72 @@ function initializeAndStart() {
   position = vec3.create([terrain_size / 2, 0, 1.2, 1]);
 
   // Avvia il programma
-  main(document.getElementById("mp2-canvas"));
+  main(document.getElementById("canvas"));
 }
 
-var audio = document.getElementById("backgroundAudio");
-audio.play();
-
-var fullscreenButton = document.getElementById("fullscreenButton");
-
-// Aggiungi un listener per il click sul bottone
-fullscreenButton.addEventListener("click", function() {
-  var canvas = document.getElementById("mp2-canvas");
-
-  // Controlla se il browser supporta la modalità fullscreen
-  if (document.fullscreenEnabled) {
-    // Richiedi la modalità fullscreen per il canvas
-    canvas.requestFullscreen();
-  } else {
-    alert("Fullscreen non supportato dal browser.");
-  }
-});
-
-
+function isPowerOf2(value) {
+  return (value & (value - 1)) === 0;
+}
 
 // Bind dell'evento ready del documento per inizializzare e avviare il programma
 $(document).ready(initializeAndStart);
 
 // Bind dell'evento change per l'elemento #ufo_mode per gestire il cambio di modalità UFO
 $('#ufo_mode').change(function() {
-  ufo_mode = ($(this).attr('checked')) ? true : false;
-});
-
-// Funzione per gestire gli eventi di pressione dei tasti
-function handleKeyDown(e) {
-  var key
-  if (typeof (e) != "number") {
-    key = e.keyCode;
-  } else {
-    key = e
-  }
-
-  var right = vec3.create();
-  vec3.cross(forward, up, right);
-  var rotateMatrix = mat4.create();
-  mat4.identity(rotateMatrix);
-  console.log(key)
-  switch (key) {
-    case 87: // w
-      vertical_angular_velocity = -0.30;
-      break;
-    case 83: // s
-      vertical_angular_velocity = 0.30;
-      break;
-    case 65: // a
-      roll_angular_velocity = -0.30;
-      break;
-    case 68: // d
-      roll_angular_velocity = 0.30;
-      break;
-    case 189: // -
-      velocity -= 0.01;
-      break;
-    case 187: // +
-      velocity += 0.01;
-      break;
-  }
-}
-
-// Bind degli eventi di pressione dei tasti
-$(document).bind('keydown', handleKeyDown);
-// Bind degli eventi di click per i bottoni delle frecce direzionali
-document.querySelectorAll(".arrow-key").forEach(function(button) {
-  button.addEventListener("click", function() {
-    var keyCode = parseInt(button.getAttribute("data-key"));
-    handleKeyDown(keyCode);
-  });
+  ufo_mode = $(this).prop('checked');
 });
 
 
-// Funzione per gestire gli eventi di rilascio dei tasti
-function handleKeyUp(e) {
-  var key = e.keyCode;
-  if (key == 83 || key == 87) { // s o w
-    vertical_angular_velocity = 0;
-  }
-  if (key == 65 || key == 68) { // a o d
-    roll_angular_velocity = 0;
+var numSpaceshipVertices; // Numero totale di vertici dello spaceship
+
+async function loadSpaceshipModel() {
+  const objHref = '../spaceship/prometheus.obj';
+  // const objHref = '../Tree/Tree.obj';
+  const response = await fetch(objHref);
+  const objText = await response.text();
+  const objData = parseOBJ(objText);
+
+  // Assicurati che l'oggetto restituito da parseOBJ contenga i dati necessari
+  if (objData && objData.geometries && objData.geometries.length > 0) {
+    for (let i = 0; i < objData.geometries.length; i++) {
+      const geometry = objData.geometries[i];
+      const data = geometry.data;
+      // Verifica se sono presenti vertici e normali
+      if (data.position && data.normal) {
+        const positions = data.position;
+        const normals = data.normal;
+
+        // Crea buffer per i vertici dello spaceship
+        const verticesBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, verticesBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+
+        // Crea buffer per le normali dello spaceship
+        const normalsBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, normalsBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normals), gl.STATIC_DRAW);
+
+        // Aggiungi i buffer e il numero di vertici all'array di geometrie dello spaceship
+        spaceshipGeometries.push({
+          verticesBuffer: verticesBuffer,
+          normalsBuffer: normalsBuffer,
+          numVertices: positions.length / 3
+        });
+      }
+    }
+    // Calcola il numero totale di vertici dello spaceship
+    numSpaceshipVertices = spaceshipGeometries.reduce((total, geometry) => total + geometry.numVertices, 0);
   }
 }
 
-// Bind degli eventi di rilascio dei tasti
-$(document).bind('keyup', handleKeyUp);
-
-
-//function WebGL(canvas){
-function main(canvas) {
+// Funzione principale per il rendering WebGL
+async function main(canvas) {
   initGL(canvas);
+  await loadSpaceshipModel();
   initBuffers();
   initShaders();
 
-  // gl.clearColor(0.9, 1., 0.9, 1.0);
-  gl.clearColor(0.0, 0.0, 0.0, 1.0);
+  gl.clearColor(0.6, 0.8, 0.9, 1.0);
   gl.enable(gl.DEPTH_TEST);
 
   tick();
@@ -126,25 +92,30 @@ function main(canvas) {
 
 var gl;
 var shaderProgram;
+var pMatrix = mat4.create();
 
 function initGL(canvas) {
   try {
-    gl = canvas.getContext("experimental-webgl");
+    gl = canvas.getContext("webgl");
+    if (!gl) {
+      gl = canvas.getContext("experimental-webgl");
+    }
+    if (!gl) {
+      throw new Error("WebGL context could not be initialized.");
+    }
     gl.viewportWidth = canvas.width;
     gl.viewportHeight = canvas.height;
   } catch (e) {
-    if (!gl) {
-      alert("WebGL canvas could not be initialized.");
-    }
+    console.error("Error initializing WebGL:", e.message);
   }
 }
 
 /**
- * Initalize shaders
+ * Inizializza gli shader
  */
 function initShaders() {
-  var vertexShader = getShader(gl, "shader-vs");
-  var fragmentShader = getShader(gl, "shader-fs");
+  var vertexShader = getShader(gl, "shader-vs-mountain");
+  var fragmentShader = getShader(gl, "shader-fs-mountain");
 
   var program = gl.createProgram();
   gl.attachShader(program, vertexShader);
@@ -157,22 +128,20 @@ function initShaders() {
 
   gl.useProgram(program);
 
-  // Set vertex position attribute
+  // Set attributi dei vertici
   program.vertexPositionAttribute = gl.getAttribLocation(program, "aVertexPosition");
   gl.enableVertexAttribArray(program.vertexPositionAttribute);
 
-  // Set vertex normal attribute
+  // Set attributi delle normali
   program.vertexNormalAttribute = gl.getAttribLocation(program, "aVertexNormal");
   gl.enableVertexAttribArray(program.vertexNormalAttribute);
 
   // Set uniform locations
   program.pMatrixUniform = gl.getUniformLocation(program, "uPMatrix");
-
   program.useLightingUniform = gl.getUniformLocation(program, "uUseLighting");
   program.ambientColorUniform = gl.getUniformLocation(program, "uAmbientColor");
   program.lightingDirectionUniform = gl.getUniformLocation(program, "uLightingDirection");
   program.directionalColorUniform = gl.getUniformLocation(program, "uDirectionalColor");
-
   program.positionUniform = gl.getUniformLocation(program, "uPosition");
   program.forwardUniform = gl.getUniformLocation(program, "uForward");
   program.upUniform = gl.getUniformLocation(program, "uUp");
@@ -180,27 +149,25 @@ function initShaders() {
   shaderProgram = program;
 }
 
-var pMatrix = mat4.create();
-
 /**
- * Set matrix uniform variables
+ * Imposta le variabili uniform delle matrici
  */
 function setMatrixUniforms() {
   gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, pMatrix);
 }
 
 /**
- * Initialize buffers
+ * Inizializza i buffer
  */
 var mountainVertexPositionBuffer;
 var mountainVertexNormalBuffer;
-var mountainVertexColorBuffer;
+
 function initBuffers() {
   var mountain = MountainGenerator.generateMountain(terrain_size, size_x, size_y, noise_size_x, noise_size_y, max_height);
   var mountainVertices = mountain[0];
   var mountainNormals = mountain[1];
 
-  // Create vertex buffer
+  // Crea il buffer dei vertici
   mountainVertexPositionBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, mountainVertexPositionBuffer);
   var vertices = mountainVertices;
@@ -208,7 +175,7 @@ function initBuffers() {
   mountainVertexPositionBuffer.itemSize = 3;
   mountainVertexPositionBuffer.numItems = mountainVertices.length / 3;
 
-  // Create vertex normal buffer
+  // Crea il buffer delle normali
   mountainVertexNormalBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, mountainVertexNormalBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(mountainNormals), gl.STATIC_DRAW);
@@ -216,45 +183,39 @@ function initBuffers() {
   mountainVertexNormalBuffer.numItems = mountainNormals.length / 3;
 }
 
-
-
 var angle = 0;
 var last = 0;
-
 var forward = vec3.create([0, 0.9924753308296204, -0.12244734913110733]);
 var up = vec3.create([0, 0, 1, 0]);
 var position = vec3.create([12, 0, 1.2, 1]);
 var velocity = 0.20;
-
 var vertical_angular_velocity = 0;
 var roll_angular_velocity = 0;
 
 function tick() {
-  requestAnimFrame(tick);
+  requestAnimationFrame(tick);
   display();
 
   var now = new Date().getTime();
   if (last != 0) {
     var delta = (now - last) / 1000
-    // Move forward
-    position[0] += delta * velocity * forward[0];
-    position[1] += delta * velocity * forward[1];
-    position[2] += delta * velocity * forward[2];
+    // Spostamento in avanti
+    position[0] += delta * velocity * forward[0]; // Sposta lungo l'asse x
+    position[1] += delta * velocity * forward[1]; // Sposta lungo l'asse y
+    position[2] += delta * velocity * forward[2]; // Sposta lungo l'asse z
 
-    // Rotate based on roll
-    // normal vector of forward-z plane
+    // Rotazione basata su roll
     var n_fz = vec3.create();
     vec3.cross(forward, vec3.create([0, 0, 1]), n_fz);
     vec3.normalize(n_fz);
-    var roll = vec3.dot(n_fz, up); // both vectors are unit so cosB = dot(n_fz, up)
+    var roll = vec3.dot(n_fz, up);
 
-    // Turn according to roll
     var rotateMatrix = mat4.create();
     mat4.identity(rotateMatrix);
     mat4.rotate(rotateMatrix, -1 * delta * Math.tan(roll), up);
     mat4.multiplyVec3(rotateMatrix, forward);
 
-    // Pitch up or down
+    // Inclinazione su o giù
     var right = vec3.create();
     vec3.cross(forward, up, right);
     mat4.identity(rotateMatrix);
@@ -262,7 +223,7 @@ function tick() {
     mat4.multiplyVec3(rotateMatrix, up);
     mat4.multiplyVec3(rotateMatrix, forward);
 
-    // Roll sideways
+    // Roll laterale
     mat4.identity(rotateMatrix);
     mat4.rotate(rotateMatrix, delta * roll_angular_velocity, forward);
     mat4.multiplyVec3(rotateMatrix, up);
@@ -270,16 +231,15 @@ function tick() {
   last = now;
 }
 
-
-function display() {
-  // Set viewport
+async function display() {
+  // Imposta viewport
   gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
 
-  // Clear screen
+  // Cancella lo schermo
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-  // Setup perspective matrix
-  mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0, pMatrix);
+  // Imposta matrice prospettica
+  mat4.perspective(90, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0, pMatrix);
 
   gl.bindBuffer(gl.ARRAY_BUFFER, mountainVertexPositionBuffer);
   gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, mountainVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
@@ -287,15 +247,10 @@ function display() {
   gl.bindBuffer(gl.ARRAY_BUFFER, mountainVertexNormalBuffer);
   gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, 3, gl.FLOAT, false, 0, 0);
 
-  // Ambient light Color
-  gl.uniform3f(shaderProgram.ambientColorUniform, 0.8, 0.8, 0.8);
+  // Colore luce ambientale
+  gl.uniform3f(shaderProgram.ambientColorUniform, 0.8, 0.6, 0.1);
 
-
-  if (ufo_mode) {
-    var lightingDirection = forward;
-  } else {
-    var lightingDirection = [0, 0.8944714069366455, -0.44713249802589417];
-  }
+  var lightingDirection = ufo_mode ? forward : [0, 0.8944714069366455, -0.44713249802589417];
   var adjustedLD = vec3.create();
   vec3.normalize(lightingDirection, adjustedLD);
   vec3.scale(adjustedLD, -1);
@@ -307,21 +262,33 @@ function display() {
   gl.uniform3fv(shaderProgram.forwardUniform, forward);
   gl.uniform3fv(shaderProgram.upUniform, up);
 
-  // Set matrix uniforms and draw
   setMatrixUniforms();
   gl.drawArrays(gl.TRIANGLES, 0, mountainVertexPositionBuffer.numItems);
+
+  // Disegna le geometrie dello spaceship
+  if (spaceshipGeometries.length > 0) {
+    for (let i = 0; i < spaceshipGeometries.length; i++) {
+      const geometry = spaceshipGeometries[i];
+      gl.bindBuffer(gl.ARRAY_BUFFER, geometry.verticesBuffer);
+      gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
+
+      gl.bindBuffer(gl.ARRAY_BUFFER, geometry.normalsBuffer);
+      gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, 3, gl.FLOAT, false, 0, 0);
+
+      setMatrixUniforms();
+      gl.drawArrays(gl.TRIANGLES, 0, geometry.numVertices);
+    }
+  }
+  
 }
 
-
-
 /**
- * Helper funciton that gets shader from dom
+ * Funzione ausiliaria per ottenere lo shader dal DOM
  */
 function getShader(gl, id) {
   var script = document.getElementById(id);
   if (!script) return null;
 
-  // Get source text of shdaer
   var source = "";
   var currentElement = script.firstChild;
   while (currentElement) {
@@ -331,7 +298,6 @@ function getShader(gl, id) {
     currentElement = currentElement.nextSibling;
   }
 
-  // Get shader object
   var shader;
   if (script.type == "x-shader/x-vertex") {
     shader = gl.createShader(gl.VERTEX_SHADER);
@@ -342,11 +308,9 @@ function getShader(gl, id) {
     return null;
   }
 
-  // Set shader source and compile
   gl.shaderSource(shader, source);
   gl.compileShader(shader);
 
-  // Alert if error occurs
   if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
     alert(gl.getShaderInfoLog(shader));
     return null;

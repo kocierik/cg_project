@@ -1,0 +1,400 @@
+# Blender MTL File: 'untitled273.blend'
+# Material Count: 38
+
+newmtl None
+Ns 0
+Ka 0.000000 0.000000 0.000000
+Kd 0.8 0.8 0.8
+Ks 0.8 0.8 0.8
+d 1
+illum 2
+
+newmtl None_prbrown.jpg
+Ns 0
+Ka 0.000000 0.000000 0.000000
+Kd 0.8 0.8 0.8
+Ks 0.8 0.8 0.8
+d 1
+illum 2
+map_Kd prbrown.jpg
+
+newmtl prblue1mat
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.800000 0.800000 0.800000
+Ks 1.000000 1.000000 1.000000
+Ni 1.000000
+d 1.000000
+illum 0
+map_Kd prblue1.jpg
+map_Ke prblue1.jpg
+
+newmtl prbluemat
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.758033 0.758033 0.758033
+Ks 1.000000 1.000000 1.000000
+Ni 1.000000
+d 1.000000
+illum 0
+map_Kd prblue.jpg
+map_Ka prblue.jpg
+map_Ke prblue.jpg
+
+newmtl prfrontmat
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.800000 0.800000 0.800000
+Ks 1.000000 1.000000 1.000000
+Ni 1.000000
+d 1.000000
+illum 0
+map_Kd prfront.jpg
+map_Ka prfront.jpg
+map_Ke prfront.jpg
+
+newmtl prmainmat
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.457516 0.457516 0.457516
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd prbottom0.jpg
+
+newmtl prmainmat_NONE
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.457516 0.457516 0.457516
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd prgray5.jpg
+
+newmtl prmainmat_prblue1.jpg
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.457516 0.457516 0.457516
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd prblue1.jpg
+
+newmtl prmainmat_prbottom.jpg
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.457516 0.457516 0.457516
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd prbottom.jpg
+
+newmtl prmainmat_prbottom1
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.457516 0.457516 0.457516
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd prbottom1.jpg
+
+newmtl prmainmat_prbrow2.jpg
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.457516 0.457516 0.457516
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd prbrow2.jpg
+
+newmtl prmainmat_prbrown.jpg
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.457516 0.457516 0.457516
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd prbrown.jpg
+
+newmtl prmainmat_prgray1.jpg
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.457516 0.457516 0.457516
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd prgray1.jpg
+
+newmtl prmainmat_prgray2.jpg
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.457516 0.457516 0.457516
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd prgray2.jpg
+
+newmtl prmainmat_prgray3.jpg
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.457516 0.457516 0.457516
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd prgray3.jpg
+
+newmtl prmainmat_prgray4.jpg
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.457516 0.457516 0.457516
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd prgray4.jpg
+
+newmtl prmainmat_prgray5.jpg
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.457516 0.457516 0.457516
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd prgray5.jpg
+
+newmtl prmainmat_prgreen.jpg
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.457516 0.457516 0.457516
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd prgreen.jpg
+
+newmtl prmainmat_prred.jpg
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.457516 0.457516 0.457516
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd prred.jpg
+
+newmtl prmainmat_prside
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.457516 0.457516 0.457516
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd prside.jpg
+
+newmtl prmainmat_prtop
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.457516 0.457516 0.457516
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd prtop.jpg
+
+newmtl prmainmat_prtop1.jpg
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.457516 0.457516 0.457516
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd prtop1.jpg
+
+newmtl prmainmat_prtopscritta.jpg
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.457516 0.457516 0.457516
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd prtopscritta.jpg
+
+newmtl prmainmat_prup1.jpg
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.457516 0.457516 0.457516
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd prup1.jpg
+
+newmtl prmainmat_prup2
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.457516 0.457516 0.457516
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd prup2.jpg
+
+newmtl prmainmat_prup3.jpg
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.457516 0.457516 0.457516
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd prup3.jpg
+
+newmtl prmainmat_prup4.jpg
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.457516 0.457516 0.457516
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd prup4.jpg
+
+newmtl prmainmat_prwhite.jpg
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.457516 0.457516 0.457516
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd prwhite.jpg
+
+newmtl prmainmat_pryellow.jpg
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.457516 0.457516 0.457516
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd pryellow.jpg
+
+newmtl prmainmat_symbol.jpg
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.457516 0.457516 0.457516
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd symbol.jpg
+
+newmtl prmatblue2
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.800000 0.800000 0.800000
+Ks 1.000000 1.000000 1.000000
+Ni 1.000000
+d 1.000000
+illum 0
+map_Kd prblue2.jpg
+map_Ka prblue2.jpg
+map_Ke prblue2.jpg
+
+newmtl prmategreen1
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.800000 0.800000 0.800000
+Ks 1.000000 1.000000 1.000000
+Ni 1.000000
+d 1.000000
+illum 0
+map_Kd prgreen1.jpg
+map_Ka prgreen1.jpg
+map_Ke prgreen1.jpg
+
+newmtl prmaterial
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 1.000000 1.000000 1.000000
+Ni 1.000000
+d 1.000000
+illum 0
+map_Kd prup1.jpg
+map_Ka prup1.jpg
+map_Ke prup1.jpg
+
+newmtl prmaterial.001
+Ns 92.156863
+Ka 0.000000 0.000000 0.000000
+Kd 0.512000 0.512000 0.512000
+Ks 1.000000 1.000000 1.000000
+Ni 1.000000
+d 1.000000
+illum 0
+map_Kd prup1.jpg
+map_Ka prup1.jpg
+map_Ke prup1.jpg
+
+newmtl prmatred
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.800000 0.800000 0.800000
+Ks 1.000000 1.000000 1.000000
+Ni 1.000000
+d 1.000000
+illum 0
+map_Kd prred.jpg
+map_Ka prred.jpg
+map_Ke prred.jpg
+
+newmtl prmatred_prgreen1.jpg
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.800000 0.800000 0.800000
+Ks 1.000000 1.000000 1.000000
+Ni 1.000000
+d 1.000000
+illum 0
+map_Kd prgreen1.jpg
+map_Ka prred.jpg
+map_Ke prred.jpg
+
+newmtl prmatwhite
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.800000 0.800000 0.800000
+Ks 1.000000 1.000000 1.000000
+Ni 1.000000
+d 1.000000
+illum 0
+map_Kd prwhite.jpg
+map_Ka prwhite.jpg
+map_Ke prwhite.jpg
+
+newmtl prside1mat
+Ns 174.509804
+Ka 0.000000 0.000000 0.000000
+Kd 0.800000 0.800000 0.800000
+Ks 1.000000 1.000000 1.000000
+Ni 1.000000
+d 1.000000
+illum 0
+map_Kd prside1.jpg
+map_Ka prside1.jpg
+map_Ke prside1.jpg
