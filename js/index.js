@@ -42,45 +42,54 @@ class WebGLApp {
     return (value & (value - 1)) === 0;
   }
 
-  async loadSpaceshipModel(scaleFactor) {
+  async loadSpaceshipModel(scaleFactor, translation) {
     const objHref = '../spaceship/prometheus.obj';
     const response = await fetch(objHref);
     const objText = await response.text();
     const objData = parseOBJ(objText);
 
     if (objData && objData.geometries && objData.geometries.length > 0) {
-      for (let i = 0; i < objData.geometries.length; i++) {
-        const geometry = objData.geometries[i];
-        const data = geometry.data;
-        if (data.position && data.normal) {
-          const positions = data.position.map((pos, index) => {
-            // Scale each coordinate by scaleFactor
-            return pos * scaleFactor;
-          });
-          const normals = data.normal;
+        for (let i = 0; i < objData.geometries.length; i++) {
+            const geometry = objData.geometries[i];
+            const data = geometry.data;
+            if (data.position && data.normal) {
+                const positions = data.position.map((pos, index) => {
+                    // Scale each coordinate by scaleFactor
+                    return pos * scaleFactor;
+                });
 
-          const verticesBuffer = this.gl.createBuffer();
-          this.gl.bindBuffer(this.gl.ARRAY_BUFFER, verticesBuffer);
-          this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(positions), this.gl.STATIC_DRAW);
+                // Apply translation
+                for (let j = 0; j < positions.length; j += 3) {
+                    positions[j] += translation[0]; // x
+                    positions[j + 1] += translation[1]; // y
+                    positions[j + 2] += translation[2]; // z
+                }
 
-          const normalsBuffer = this.gl.createBuffer();
-          this.gl.bindBuffer(this.gl.ARRAY_BUFFER, normalsBuffer);
-          this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(normals), this.gl.STATIC_DRAW);
+                const normals = data.normal;
 
-          this.spaceshipGeometries.push({
-            verticesBuffer: verticesBuffer,
-            normalsBuffer: normalsBuffer,
-            numVertices: positions.length / 3
-          });
+                const verticesBuffer = this.gl.createBuffer();
+                this.gl.bindBuffer(this.gl.ARRAY_BUFFER, verticesBuffer);
+                this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(positions), this.gl.STATIC_DRAW);
+
+                const normalsBuffer = this.gl.createBuffer();
+                this.gl.bindBuffer(this.gl.ARRAY_BUFFER, normalsBuffer);
+                this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(normals), this.gl.STATIC_DRAW);
+
+                this.spaceshipGeometries.push({
+                    verticesBuffer: verticesBuffer,
+                    normalsBuffer: normalsBuffer,
+                    numVertices: positions.length / 3
+                });
+            }
         }
-      }
-      this.numSpaceshipVertices = this.spaceshipGeometries.reduce((total, geometry) => total + geometry.numVertices, 0);
+        this.numSpaceshipVertices = this.spaceshipGeometries.reduce((total, geometry) => total + geometry.numVertices, 0);
     }
 }
 
+
   async main(canvas) {
     this.initGL(canvas);
-    await this.loadSpaceshipModel(1.4);
+    await this.loadSpaceshipModel(1.2,[8, 7, 5]);
     this.initBuffers();
     this.initShaders();
 
