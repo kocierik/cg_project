@@ -23,6 +23,9 @@ class WebGLApp {
     this.mountainVertexPositionBuffer;
     this.mountainVertexNormalBuffer;
     this.spaceshipBoundingBox;
+    this.spaceshipTranslationOffset = [5, 1, -3]; 
+    this.collided = false; 
+    this.points = 0
   }
 
   async initializeAndStart() {
@@ -123,10 +126,29 @@ class WebGLApp {
     this.spaceshipBoundingBox = boundingBox;
 }
 
+async recreateSpaceship() {
+  // Remove all geometries of the current spaceship
+  this.spaceshipGeometries = [];
+
+  // Generate new random coordinates within the bounds of the terrain
+  const randomX = Math.random() * (this.size_x - this.terrain_size);
+  const randomY = Math.random() * (this.size_y - this.terrain_size);
+  const randomZ = 0; // Assuming the spaceship is on the surface of the terrain
+  this.spaceshipTranslationOffset = [randomX, randomY, randomZ];
+
+  // Create a new spaceship with a new position and translation
+  await this.loadSpaceshipModel(0.05, this.spaceshipTranslationOffset);
+  console.log(this.spaceshipTranslationOffset)
+
+  // Reset the collision flag
+  this.collided = false;
+}
+
 
   async main(canvas) {
     this.initGL(canvas);
-    await this.loadSpaceshipModel(0.05,[5, 3, -3]);
+    this.spaceshipTranslationOffset = [5, 1, -3]
+    await this.loadSpaceshipModel(0.05,this.spaceshipTranslationOffset);
     this.initBuffers();
     this.initShaders();
 
@@ -230,6 +252,7 @@ class WebGLApp {
         myPosition[2] >= spaceshipMin.z && myPosition[2] <= spaceshipMax.z
     ) {
         // Collision detected
+        this.points += 1
         return true;
     }
 
@@ -240,16 +263,22 @@ class WebGLApp {
 
 
 
-  tick() {
+  async tick() {
     requestAnimationFrame(this.tick.bind(this));
     this.display();
-        // Rilevamento della collisione
-        const collided = this.checkCollision(); 
+
+            // Rilevamento della collisione
+      if (!this.collided) { // Controlla se non è già stata gestita una collisione
+        const collided = this.checkCollision();
 
         if (collided) {
           console.log("Collisione rilevata con l'oggetto caricato!");
           // Esegui altre azioni in risposta alla collisione, se necessario
+          
+          this.collided = true;
+          await this.recreateSpaceship();
         }
+      }
 
     const now = new Date().getTime();
     if (this.last != 0) {
