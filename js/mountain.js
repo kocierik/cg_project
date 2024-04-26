@@ -123,6 +123,9 @@ var MountainGenerator = (function() {
                 normals.push(normal[0], normal[1], normal[2]);
             }
         }
+        // console.log("mesh --> ", mesh)
+        // console.log("normals --> ", normals)
+        
         return [mesh, normals];
     }
 

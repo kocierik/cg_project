@@ -1,320 +1,342 @@
-var terrain_size;
-var size_x;
-var size_y;
-var noise_size_x;
-var noise_size_y;
-var max_height;
-var ufo_mode = false;
-var spaceshipGeometries = []; // Array per memorizzare le geometrie dello spaceship
+class WebGLApp {
+  constructor() {
+    this.terrain_size;
+    this.size_x;
+    this.size_y;
+    this.noise_size_x;
+    this.noise_size_y;
+    this.max_height;
+    this.ufo_mode = false;
+    this.spaceshipGeometries = [];
+    this.numSpaceshipVertices;
+    this.gl;
+    this.shaderProgram;
+    this.pMatrix = mat4.create();
+    this.angle = 0;
+    this.last = 0;
+    this.forward = vec3.create([0, 0.9924753308296204, -0.12244734913110733]);
+    this.up = vec3.create([0, 0, 1, 0]);
+    this.position = vec3.create([12, 0, 1.2, 1]);
+    this.velocity = 0.20;
+    this.vertical_angular_velocity = 0;
+    this.roll_angular_velocity = 0;
+    this.mountainVertexPositionBuffer;
+    this.mountainVertexNormalBuffer;
+  }
 
-// Funzione per inizializzare e avviare il programma
-function initializeAndStart() {
-  // Ottieni i valori delle opzioni
-  terrain_size = parseFloat($('#terrain_size').val());
-  size_x = parseFloat($('#size_x').val());
-  size_y = parseFloat($('#size_y').val());
-  noise_size_x = parseFloat($('#noise_size_x').val());
-  noise_size_y = parseFloat($('#noise_size_y').val());
-  max_height = parseFloat($('#max_height').val());
-  position = vec3.create([terrain_size / 2, 0, 1.2, 1]);
+  async initializeAndStart() {
+    // Get option values
+    this.terrain_size = parseFloat($('#terrain_size').val());
+    this.size_x = parseFloat($('#size_x').val());
+    this.size_y = parseFloat($('#size_y').val());
+    this.noise_size_x = parseFloat($('#noise_size_x').val());
+    this.noise_size_y = parseFloat($('#noise_size_y').val());
+    this.max_height = parseFloat($('#max_height').val());
+    this.position = vec3.create([this.terrain_size / 2, 0, 1.2, 1]);
 
-  // Avvia il programma
-  main(document.getElementById("canvas"));
-}
+    // Start the program
+    this.main(document.getElementById("canvas"));
+  }
 
-function isPowerOf2(value) {
-  return (value & (value - 1)) === 0;
-}
+  isPowerOf2(value) {
+    return (value & (value - 1)) === 0;
+  }
 
-// Bind dell'evento ready del documento per inizializzare e avviare il programma
-$(document).ready(initializeAndStart);
+  async loadSpaceshipModel() {
+    const objHref = '../spaceship/prometheus.obj';
+    const response = await fetch(objHref);
+    const objText = await response.text();
+    const objData = parseOBJ(objText);
 
-// Bind dell'evento change per l'elemento #ufo_mode per gestire il cambio di modalità UFO
-$('#ufo_mode').change(function() {
-  ufo_mode = $(this).prop('checked');
-});
+    if (objData && objData.geometries && objData.geometries.length > 0) {
+      for (let i = 0; i < objData.geometries.length; i++) {
+        const geometry = objData.geometries[i];
+        const data = geometry.data;
+        if (data.position && data.normal) {
+          const positions = data.position;
+          const normals = data.normal;
 
+          const verticesBuffer = this.gl.createBuffer();
+          this.gl.bindBuffer(this.gl.ARRAY_BUFFER, verticesBuffer);
+          this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(positions), this.gl.STATIC_DRAW);
 
-var numSpaceshipVertices; // Numero totale di vertici dello spaceship
+          const normalsBuffer = this.gl.createBuffer();
+          this.gl.bindBuffer(this.gl.ARRAY_BUFFER, normalsBuffer);
+          this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(normals), this.gl.STATIC_DRAW);
 
-async function loadSpaceshipModel() {
-  const objHref = '../spaceship/prometheus.obj';
-  // const objHref = '../Tree/Tree.obj';
-  const response = await fetch(objHref);
-  const objText = await response.text();
-  const objData = parseOBJ(objText);
+          this.spaceshipGeometries.push({
+            verticesBuffer: verticesBuffer,
+            normalsBuffer: normalsBuffer,
+            numVertices: positions.length / 3
+          });
+        }
+      }
+      this.numSpaceshipVertices = this.spaceshipGeometries.reduce((total, geometry) => total + geometry.numVertices, 0);
+    }
+  }
 
-  // Assicurati che l'oggetto restituito da parseOBJ contenga i dati necessari
-  if (objData && objData.geometries && objData.geometries.length > 0) {
-    for (let i = 0; i < objData.geometries.length; i++) {
-      const geometry = objData.geometries[i];
-      const data = geometry.data;
-      // Verifica se sono presenti vertici e normali
-      if (data.position && data.normal) {
-        const positions = data.position;
-        const normals = data.normal;
+  async main(canvas) {
+    this.initGL(canvas);
+    await this.loadSpaceshipModel();
+    this.initBuffers();
+    this.initShaders();
 
-        // Crea buffer per i vertici dello spaceship
-        const verticesBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, verticesBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+    this.gl.clearColor(0.6, 0.8, 0.9, 1.0);
+    this.gl.enable(this.gl.DEPTH_TEST);
 
-        // Crea buffer per le normali dello spaceship
-        const normalsBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, normalsBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normals), gl.STATIC_DRAW);
+    this.tick();
+  }
 
-        // Aggiungi i buffer e il numero di vertici all'array di geometrie dello spaceship
-        spaceshipGeometries.push({
-          verticesBuffer: verticesBuffer,
-          normalsBuffer: normalsBuffer,
-          numVertices: positions.length / 3
-        });
+  initGL(canvas) {
+    try {
+      this.gl = canvas.getContext("webgl");
+      if (!this.gl) {
+        this.gl = canvas.getContext("experimental-webgl");
+      }
+      if (!this.gl) {
+        throw new Error("WebGL context could not be initialized.");
+      }
+      this.gl.viewportWidth = canvas.width;
+      this.gl.viewportHeight = canvas.height;
+    } catch (e) {
+      console.error("Error initializing WebGL:", e.message);
+    }
+  }
+
+  initShaders() {
+    const vertexShader = this.getShader(this.gl, "shader-vs-mountain");
+    const fragmentShader = this.getShader(this.gl, "shader-fs-mountain");
+
+    const program = this.gl.createProgram();
+    this.gl.attachShader(program, vertexShader);
+    this.gl.attachShader(program, fragmentShader);
+    this.gl.linkProgram(program);
+
+    if (!this.gl.getProgramParameter(program, this.gl.LINK_STATUS)) {
+      alert("Could not initialize shader program.");
+    }
+
+    this.gl.useProgram(program);
+
+    // Set vertex attribute locations
+    program.vertexPositionAttribute = this.gl.getAttribLocation(program, "aVertexPosition");
+    this.gl.enableVertexAttribArray(program.vertexPositionAttribute);
+
+    program.vertexNormalAttribute = this.gl.getAttribLocation(program, "aVertexNormal");
+    this.gl.enableVertexAttribArray(program.vertexNormalAttribute);
+
+    // Set uniform locations
+    program.pMatrixUniform = this.gl.getUniformLocation(program, "uPMatrix");
+    program.useLightingUniform = this.gl.getUniformLocation(program, "uUseLighting");
+    program.ambientColorUniform = this.gl.getUniformLocation(program, "uAmbientColor");
+    program.lightingDirectionUniform = this.gl.getUniformLocation(program, "uLightingDirection");
+    program.directionalColorUniform = this.gl.getUniformLocation(program, "uDirectionalColor");
+    program.positionUniform = this.gl.getUniformLocation(program, "uPosition");
+    program.forwardUniform = this.gl.getUniformLocation(program, "uForward");
+    program.upUniform = this.gl.getUniformLocation(program, "uUp");
+
+    this.shaderProgram = program;
+  }
+
+  setMatrixUniforms() {
+    this.gl.uniformMatrix4fv(this.shaderProgram.pMatrixUniform, false, this.pMatrix);
+  }
+
+  initBuffers() {
+    const mountain = MountainGenerator.generateMountain(this.terrain_size, this.size_x, this.size_y, this.noise_size_x, this.noise_size_y, this.max_height);
+    const mountainVertices = mountain[0];
+    const mountainNormals = mountain[1];
+
+    this.mountainVertexPositionBuffer = this.gl.createBuffer();
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.mountainVertexPositionBuffer);
+    this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(mountainVertices), this.gl.STATIC_DRAW);
+    this.mountainVertexPositionBuffer.itemSize = 3;
+    this.mountainVertexPositionBuffer.numItems = mountainVertices.length / 3;
+
+    this.mountainVertexNormalBuffer = this.gl.createBuffer();
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.mountainVertexNormalBuffer);
+    this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(mountainNormals), this.gl.STATIC_DRAW);
+    this.mountainVertexNormalBuffer.itemSize = 3;
+    this.mountainVertexNormalBuffer.numItems = mountainNormals.length / 3;
+  }
+
+  tick() {
+    requestAnimationFrame(this.tick.bind(this));
+    this.display();
+
+    const now = new Date().getTime();
+    if (this.last != 0) {
+      const delta = (now - this.last) / 1000;
+
+      this.position[0] += delta * this.velocity * this.forward[0];
+      this.position[1] += delta * this.velocity * this.forward[1];
+      this.position[2] += delta * this.velocity * this.forward[2];
+
+      const n_fz = vec3.create();
+      vec3.cross(this.forward, vec3.create([0, 0, 1]), n_fz);
+      vec3.normalize(n_fz);
+      const roll = vec3.dot(n_fz, this.up);
+
+      const rotateMatrix = mat4.create();
+      mat4.identity(rotateMatrix);
+      mat4.rotate(rotateMatrix, -1 * delta * Math.tan(roll), this.up);
+      mat4.multiplyVec3(rotateMatrix, this.forward);
+
+      const right = vec3.create();
+      vec3.cross(this.forward, this.up, right);
+      mat4.identity(rotateMatrix);
+      mat4.rotate(rotateMatrix, delta * this.vertical_angular_velocity, right);
+      mat4.multiplyVec3(rotateMatrix, this.up);
+      mat4.multiplyVec3(rotateMatrix, this.forward);
+
+      mat4.identity(rotateMatrix);
+      mat4.rotate(rotateMatrix, delta * this.roll_angular_velocity, this.forward);
+      mat4.multiplyVec3(rotateMatrix, this.up);
+    }
+    this.last = now;
+  }
+
+  async display() {
+    this.gl.viewport(0, 0, this.gl.viewportWidth, this.gl.viewportHeight);
+    this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+    mat4.perspective(90, this.gl.viewportWidth / this.gl.viewportHeight, 0.1, 100.0, this.pMatrix);
+
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.mountainVertexPositionBuffer);
+    this.gl.vertexAttribPointer(this.shaderProgram.vertexPositionAttribute, this.mountainVertexPositionBuffer.itemSize, this.gl.FLOAT, false, 0, 0);
+
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.mountainVertexNormalBuffer);
+    this.gl.vertexAttribPointer(this.shaderProgram.vertexNormalAttribute, 3, this.gl.FLOAT, false, 0, 0);
+
+    this.gl.uniform3f(this.shaderProgram.ambientColorUniform, 0.8, 0.6, 0.1);
+    const lightingDirection = this.ufo_mode ? this.forward : [0, 0.8944714069366455, -0.44713249802589417];
+    const adjustedLD = vec3.create();
+    vec3.normalize(lightingDirection, adjustedLD);
+    vec3.scale(adjustedLD, -1);
+    this.gl.uniform3fv(this.shaderProgram.lightingDirectionUniform, adjustedLD);
+    this.gl.uniform3f(this.shaderProgram.directionalColorUniform, 0.9, 0.9, 0.9);
+    this.gl.uniform3fv(this.shaderProgram.positionUniform, this.position);
+    this.gl.uniform3fv(this.shaderProgram.forwardUniform, this.forward);
+    this.gl.uniform3fv(this.shaderProgram.upUniform, this.up);
+
+    this.setMatrixUniforms();
+    this.gl.drawArrays(this.gl.TRIANGLES, 0, this.mountainVertexPositionBuffer.numItems);
+
+    if (this.spaceshipGeometries.length > 0) {
+      for (let i = 0; i < this.spaceshipGeometries.length; i++) {
+        const geometry = this.spaceshipGeometries[i];
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, geometry.verticesBuffer);
+        this.gl.vertexAttribPointer(this.shaderProgram.vertexPositionAttribute, 3, this.gl.FLOAT, false, 0, 0);
+
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, geometry.normalsBuffer);
+        this.gl.vertexAttribPointer(this.shaderProgram.vertexNormalAttribute, 3, this.gl.FLOAT, false, 0, 0);
+
+        this.setMatrixUniforms();
+        this.gl.drawArrays(this.gl.TRIANGLES, 0, geometry.numVertices);
       }
     }
-    // Calcola il numero totale di vertici dello spaceship
-    numSpaceshipVertices = spaceshipGeometries.reduce((total, geometry) => total + geometry.numVertices, 0);
   }
-}
 
-// Funzione principale per il rendering WebGL
-async function main(canvas) {
-  initGL(canvas);
-  await loadSpaceshipModel();
-  initBuffers();
-  initShaders();
+  getShader(gl, id) {
+    const script = document.getElementById(id);
+    if (!script) return null;
 
-  gl.clearColor(0.6, 0.8, 0.9, 1.0);
-  gl.enable(gl.DEPTH_TEST);
-
-  tick();
-}
-
-var gl;
-var shaderProgram;
-var pMatrix = mat4.create();
-
-function initGL(canvas) {
-  try {
-    gl = canvas.getContext("webgl");
-    if (!gl) {
-      gl = canvas.getContext("experimental-webgl");
+    let source = "";
+    let currentElement = script.firstChild;
+    while (currentElement) {
+      if (currentElement.nodeType == 3) {
+        source += currentElement.textContent;
+      }
+      currentElement = currentElement.nextSibling;
     }
-    if (!gl) {
-      throw new Error("WebGL context could not be initialized.");
+
+    let shader;
+    if (script.type == "x-shader/x-vertex") {
+      shader = gl.createShader(gl.VERTEX_SHADER);
+    } else if (script.type == "x-shader/x-fragment") {
+      shader = gl.createShader(gl.FRAGMENT_SHADER);
+    } else {
+      alert("Unknown script type.");
+      return null;
     }
-    gl.viewportWidth = canvas.width;
-    gl.viewportHeight = canvas.height;
-  } catch (e) {
-    console.error("Error initializing WebGL:", e.message);
-  }
-}
 
-/**
- * Inizializza gli shader
- */
-function initShaders() {
-  var vertexShader = getShader(gl, "shader-vs-mountain");
-  var fragmentShader = getShader(gl, "shader-fs-mountain");
+    gl.shaderSource(shader, source);
+    gl.compileShader(shader);
 
-  var program = gl.createProgram();
-  gl.attachShader(program, vertexShader);
-  gl.attachShader(program, fragmentShader);
-  gl.linkProgram(program);
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+      alert(gl.getShaderInfoLog(shader));
+      return null;
+    }
 
-  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-    alert("Could not initialize shader program.");
+    return shader;
   }
 
-  gl.useProgram(program);
+  // Function to handle key down events
+  handleKeyDown(e) {
+    var key;
+    if (typeof (e) != "number") {
+      key = e.keyCode;
+    } else {
+      key = e;
+    }
 
-  // Set attributi dei vertici
-  program.vertexPositionAttribute = gl.getAttribLocation(program, "aVertexPosition");
-  gl.enableVertexAttribArray(program.vertexPositionAttribute);
-
-  // Set attributi delle normali
-  program.vertexNormalAttribute = gl.getAttribLocation(program, "aVertexNormal");
-  gl.enableVertexAttribArray(program.vertexNormalAttribute);
-
-  // Set uniform locations
-  program.pMatrixUniform = gl.getUniformLocation(program, "uPMatrix");
-  program.useLightingUniform = gl.getUniformLocation(program, "uUseLighting");
-  program.ambientColorUniform = gl.getUniformLocation(program, "uAmbientColor");
-  program.lightingDirectionUniform = gl.getUniformLocation(program, "uLightingDirection");
-  program.directionalColorUniform = gl.getUniformLocation(program, "uDirectionalColor");
-  program.positionUniform = gl.getUniformLocation(program, "uPosition");
-  program.forwardUniform = gl.getUniformLocation(program, "uForward");
-  program.upUniform = gl.getUniformLocation(program, "uUp");
-
-  shaderProgram = program;
-}
-
-/**
- * Imposta le variabili uniform delle matrici
- */
-function setMatrixUniforms() {
-  gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, pMatrix);
-}
-
-/**
- * Inizializza i buffer
- */
-var mountainVertexPositionBuffer;
-var mountainVertexNormalBuffer;
-
-function initBuffers() {
-  var mountain = MountainGenerator.generateMountain(terrain_size, size_x, size_y, noise_size_x, noise_size_y, max_height);
-  var mountainVertices = mountain[0];
-  var mountainNormals = mountain[1];
-
-  // Crea il buffer dei vertici
-  mountainVertexPositionBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, mountainVertexPositionBuffer);
-  var vertices = mountainVertices;
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-  mountainVertexPositionBuffer.itemSize = 3;
-  mountainVertexPositionBuffer.numItems = mountainVertices.length / 3;
-
-  // Crea il buffer delle normali
-  mountainVertexNormalBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, mountainVertexNormalBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(mountainNormals), gl.STATIC_DRAW);
-  mountainVertexNormalBuffer.itemSize = 3;
-  mountainVertexNormalBuffer.numItems = mountainNormals.length / 3;
-}
-
-var angle = 0;
-var last = 0;
-var forward = vec3.create([0, 0.9924753308296204, -0.12244734913110733]);
-var up = vec3.create([0, 0, 1, 0]);
-var position = vec3.create([12, 0, 1.2, 1]);
-var velocity = 0.20;
-var vertical_angular_velocity = 0;
-var roll_angular_velocity = 0;
-
-function tick() {
-  requestAnimationFrame(tick);
-  display();
-
-  var now = new Date().getTime();
-  if (last != 0) {
-    var delta = (now - last) / 1000
-    // Spostamento in avanti
-    position[0] += delta * velocity * forward[0]; // Sposta lungo l'asse x
-    position[1] += delta * velocity * forward[1]; // Sposta lungo l'asse y
-    position[2] += delta * velocity * forward[2]; // Sposta lungo l'asse z
-
-    // Rotazione basata su roll
-    var n_fz = vec3.create();
-    vec3.cross(forward, vec3.create([0, 0, 1]), n_fz);
-    vec3.normalize(n_fz);
-    var roll = vec3.dot(n_fz, up);
-
+    var right = vec3.create();
+    vec3.cross(this.forward, this.up, right);
     var rotateMatrix = mat4.create();
     mat4.identity(rotateMatrix);
-    mat4.rotate(rotateMatrix, -1 * delta * Math.tan(roll), up);
-    mat4.multiplyVec3(rotateMatrix, forward);
-
-    // Inclinazione su o giù
-    var right = vec3.create();
-    vec3.cross(forward, up, right);
-    mat4.identity(rotateMatrix);
-    mat4.rotate(rotateMatrix, delta * vertical_angular_velocity, right);
-    mat4.multiplyVec3(rotateMatrix, up);
-    mat4.multiplyVec3(rotateMatrix, forward);
-
-    // Roll laterale
-    mat4.identity(rotateMatrix);
-    mat4.rotate(rotateMatrix, delta * roll_angular_velocity, forward);
-    mat4.multiplyVec3(rotateMatrix, up);
-  }
-  last = now;
-}
-
-async function display() {
-  // Imposta viewport
-  gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
-
-  // Cancella lo schermo
-  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-  // Imposta matrice prospettica
-  mat4.perspective(90, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0, pMatrix);
-
-  gl.bindBuffer(gl.ARRAY_BUFFER, mountainVertexPositionBuffer);
-  gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, mountainVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
-
-  gl.bindBuffer(gl.ARRAY_BUFFER, mountainVertexNormalBuffer);
-  gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, 3, gl.FLOAT, false, 0, 0);
-
-  // Colore luce ambientale
-  gl.uniform3f(shaderProgram.ambientColorUniform, 0.8, 0.6, 0.1);
-
-  var lightingDirection = ufo_mode ? forward : [0, 0.8944714069366455, -0.44713249802589417];
-  var adjustedLD = vec3.create();
-  vec3.normalize(lightingDirection, adjustedLD);
-  vec3.scale(adjustedLD, -1);
-  gl.uniform3fv(shaderProgram.lightingDirectionUniform, adjustedLD);
-
-  gl.uniform3f(shaderProgram.directionalColorUniform, 0.9, 0.9, 0.9);
-
-  gl.uniform3fv(shaderProgram.positionUniform, position);
-  gl.uniform3fv(shaderProgram.forwardUniform, forward);
-  gl.uniform3fv(shaderProgram.upUniform, up);
-
-  setMatrixUniforms();
-  gl.drawArrays(gl.TRIANGLES, 0, mountainVertexPositionBuffer.numItems);
-
-  // Disegna le geometrie dello spaceship
-  if (spaceshipGeometries.length > 0) {
-    for (let i = 0; i < spaceshipGeometries.length; i++) {
-      const geometry = spaceshipGeometries[i];
-      gl.bindBuffer(gl.ARRAY_BUFFER, geometry.verticesBuffer);
-      gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
-
-      gl.bindBuffer(gl.ARRAY_BUFFER, geometry.normalsBuffer);
-      gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, 3, gl.FLOAT, false, 0, 0);
-
-      setMatrixUniforms();
-      gl.drawArrays(gl.TRIANGLES, 0, geometry.numVertices);
+    switch (key) {
+      case 87: // w
+        this.vertical_angular_velocity = -0.30;
+        break;
+      case 83: // s
+        this.vertical_angular_velocity = 0.30;
+        break;
+      case 65: // a
+        this.roll_angular_velocity = -0.30;
+        break;
+      case 68: // d
+        this.roll_angular_velocity = 0.30;
+        break;
+      case 189: // -
+        this.velocity -= 0.01;
+        break;
+      case 187: // +
+        this.velocity += 0.01;
+        break;
     }
   }
-  
-}
 
-/**
- * Funzione ausiliaria per ottenere lo shader dal DOM
- */
-function getShader(gl, id) {
-  var script = document.getElementById(id);
-  if (!script) return null;
+  // Function to handle key up events
+  handleKeyUp(e) {
+    const key = e.keyCode;
 
-  var source = "";
-  var currentElement = script.firstChild;
-  while (currentElement) {
-    if (currentElement.nodeType == 3) {
-      source += currentElement.textContent;
+    if (key === 83 || key === 87) { // s o w
+      this.vertical_angular_velocity = 0;
     }
-    currentElement = currentElement.nextSibling;
+    if (key === 65 || key === 68) { // a o d
+      this.roll_angular_velocity = 0;
+    }
   }
 
-  var shader;
-  if (script.type == "x-shader/x-vertex") {
-    shader = gl.createShader(gl.VERTEX_SHADER);
-  } else if (script.type == "x-shader/x-fragment") {
-    shader = gl.createShader(gl.FRAGMENT_SHADER);
-  } else {
-    alert("Unknown script type.");
-    return null;
+  // Method to bind key down and key up events
+  bindKeyEvents() {
+    $(document).bind('keydown', this.handleKeyDown.bind(this));
+
+    $(document).bind('keyup', this.handleKeyUp.bind(this));
+
+    // Bind events for arrow buttons
+    document.querySelectorAll(".arrow-key").forEach(function (button) {
+      button.addEventListener("click", function () {
+        var keyCode = parseInt(button.getAttribute("data-key"));
+        this.handleKeyDown(keyCode);
+      }.bind(this));
+    }.bind(this));
   }
 
-  gl.shaderSource(shader, source);
-  gl.compileShader(shader);
-
-  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-    alert(gl.getShaderInfoLog(shader));
-    return null;
-  }
-
-  return shader;
 }
+
+// Usage
+const webGLApp = new WebGLApp();
+$(document).ready(() => {
+  webGLApp.initializeAndStart();
+  webGLApp.bindKeyEvents();
+});
