@@ -42,7 +42,7 @@ class WebGLApp {
     return (value & (value - 1)) === 0;
   }
 
-  async loadSpaceshipModel() {
+  async loadSpaceshipModel(scaleFactor) {
     const objHref = '../spaceship/prometheus.obj';
     const response = await fetch(objHref);
     const objText = await response.text();
@@ -53,7 +53,10 @@ class WebGLApp {
         const geometry = objData.geometries[i];
         const data = geometry.data;
         if (data.position && data.normal) {
-          const positions = data.position;
+          const positions = data.position.map((pos, index) => {
+            // Scale each coordinate by scaleFactor
+            return pos * scaleFactor;
+          });
           const normals = data.normal;
 
           const verticesBuffer = this.gl.createBuffer();
@@ -73,11 +76,11 @@ class WebGLApp {
       }
       this.numSpaceshipVertices = this.spaceshipGeometries.reduce((total, geometry) => total + geometry.numVertices, 0);
     }
-  }
+}
 
   async main(canvas) {
     this.initGL(canvas);
-    await this.loadSpaceshipModel();
+    await this.loadSpaceshipModel(1.4);
     this.initBuffers();
     this.initShaders();
 
