@@ -22,6 +22,7 @@ class WebGLApp {
     this.roll_angular_velocity = 0;
     this.mountainVertexPositionBuffer;
     this.mountainVertexNormalBuffer;
+    this.spaceshipBoundingBox;
   }
 
   async initializeAndStart() {
@@ -41,12 +42,19 @@ class WebGLApp {
   isPowerOf2(value) {
     return (value & (value - 1)) === 0;
   }
-
   async loadSpaceshipModel(scaleFactor, translation) {
-    const objHref = '../spaceship/prometheus.obj';
+    const objHref = '../bitcoin.obj';
+    // const objHref = '../spaceship/prometheus.obj';
     const response = await fetch(objHref);
     const objText = await response.text();
     const objData = parseOBJ(objText);
+
+    let minX = Infinity;
+    let minY = Infinity;
+    let minZ = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+    let maxZ = -Infinity;
 
     if (objData && objData.geometries && objData.geometries.length > 0) {
         for (let i = 0; i < objData.geometries.length; i++) {
@@ -63,6 +71,28 @@ class WebGLApp {
                     positions[j] += translation[0]; // x
                     positions[j + 1] += translation[1]; // y
                     positions[j + 2] += translation[2]; // z
+                }
+                // Apply rotation (rotate around the y-axis by 90 degrees)
+                const rotationAngle = Math.PI / 2; // 90 degrees in radians
+                for (let j = 0; j < positions.length; j += 3) {
+                    // Rotate each vertex position
+                    const x = positions[j];
+                    const z = positions[j + 2];
+                    positions[j] = x * Math.cos(rotationAngle) - z * Math.sin(rotationAngle);
+                    positions[j + 2] = x * Math.sin(rotationAngle) + z * Math.cos(rotationAngle);
+
+                    // Apply translation
+                    positions[j] += translation[0]; // x
+                    positions[j + 1] += translation[1]; // y
+                    positions[j + 2] += translation[2]; // z
+
+                    // Update bounding box coordinates
+                    minX = Math.min(minX, positions[j]);
+                    minY = Math.min(minY, positions[j + 1]);
+                    minZ = Math.min(minZ, positions[j + 2]);
+                    maxX = Math.max(maxX, positions[j]);
+                    maxY = Math.max(maxY, positions[j + 1]);
+                    maxZ = Math.max(maxZ, positions[j + 2]);
                 }
 
                 const normals = data.normal;
@@ -84,12 +114,19 @@ class WebGLApp {
         }
         this.numSpaceshipVertices = this.spaceshipGeometries.reduce((total, geometry) => total + geometry.numVertices, 0);
     }
+
+    // Store bounding box dimensions
+    const boundingBox = {
+        min: { x: minX, y: minY, z: minZ },
+        max: { x: maxX, y: maxY, z: maxZ }
+    };
+    this.spaceshipBoundingBox = boundingBox;
 }
 
 
   async main(canvas) {
     this.initGL(canvas);
-    await this.loadSpaceshipModel(1.2,[8, 7, 5]);
+    await this.loadSpaceshipModel(0.05,[5, 3, -3]);
     this.initBuffers();
     this.initShaders();
 
@@ -172,9 +209,47 @@ class WebGLApp {
     this.mountainVertexNormalBuffer.numItems = mountainNormals.length / 3;
   }
 
+
+  checkCollision() {
+    if (!this.spaceshipBoundingBox) {
+        // Spaceship bounding box not initialized
+        return false;
+    }
+
+    // Get your position (assuming it's stored in this.position)
+    const myPosition = this.position;
+
+    // Check for collision between your position and the spaceship's bounding box
+    const spaceshipMin = this.spaceshipBoundingBox.min;
+    const spaceshipMax = this.spaceshipBoundingBox.max;
+
+    // Check if your position is within the bounding box of the spaceship
+    if (
+        myPosition[0] >= spaceshipMin.x && myPosition[0] <= spaceshipMax.x &&
+        myPosition[1] >= spaceshipMin.y && myPosition[1] <= spaceshipMax.y &&
+        myPosition[2] >= spaceshipMin.z && myPosition[2] <= spaceshipMax.z
+    ) {
+        // Collision detected
+        return true;
+    }
+
+    // No collision detected
+    return false;
+}
+
+
+
+
   tick() {
     requestAnimationFrame(this.tick.bind(this));
     this.display();
+        // Rilevamento della collisione
+        const collided = this.checkCollision(); 
+
+        if (collided) {
+          console.log("Collisione rilevata con l'oggetto caricato!");
+          // Esegui altre azioni in risposta alla collisione, se necessario
+        }
 
     const now = new Date().getTime();
     if (this.last != 0) {
@@ -245,7 +320,7 @@ class WebGLApp {
         this.setMatrixUniforms();
         this.gl.drawArrays(this.gl.TRIANGLES, 0, geometry.numVertices);
       }
-    }
+    }    
   }
 
   getShader(gl, id) {
