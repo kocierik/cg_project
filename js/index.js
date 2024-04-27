@@ -312,7 +312,46 @@ async recreateSpaceship() {
     this.last = now;
   }
 
-  
+  async display() {
+    this.gl.viewport(0, 0, this.gl.viewportWidth, this.gl.viewportHeight);
+    this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+    mat4.perspective(90, this.gl.viewportWidth / this.gl.viewportHeight, 0.1, 100.0, this.pMatrix);
+
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.mountainVertexPositionBuffer);
+    this.gl.vertexAttribPointer(this.shaderProgram.vertexPositionAttribute, this.mountainVertexPositionBuffer.itemSize, this.gl.FLOAT, false, 0, 0);
+
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.mountainVertexNormalBuffer);
+    this.gl.vertexAttribPointer(this.shaderProgram.vertexNormalAttribute, 3, this.gl.FLOAT, false, 0, 0);
+
+    this.gl.uniform3f(this.shaderProgram.ambientColorUniform, 0.8, 0.6, 0.1);
+    const lightingDirection = this.ufo_mode ? this.forward : [0, 0.8944714069366455, -0.44713249802589417];
+    const adjustedLD = vec3.create();
+    vec3.normalize(lightingDirection, adjustedLD);
+    vec3.scale(adjustedLD, -1);
+    this.gl.uniform3fv(this.shaderProgram.lightingDirectionUniform, adjustedLD);
+    this.gl.uniform3f(this.shaderProgram.directionalColorUniform, 0.9, 0.9, 0.9);
+    this.gl.uniform3fv(this.shaderProgram.positionUniform, this.positionActor);
+    this.gl.uniform3fv(this.shaderProgram.forwardUniform, this.forward);
+    this.gl.uniform3fv(this.shaderProgram.upUniform, this.up);
+
+    this.setMatrixUniforms();
+    this.gl.drawArrays(this.gl.TRIANGLES, 0, this.mountainVertexPositionBuffer.numItems);
+
+    if (this.coinGeometries.length > 0) {
+      for (let i = 0; i < this.coinGeometries.length; i++) {
+        const geometry = this.coinGeometries[i];
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, geometry.verticesBuffer);
+        this.gl.vertexAttribPointer(this.shaderProgram.vertexPositionAttribute, 3, this.gl.FLOAT, false, 0, 0);
+
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, geometry.normalsBuffer);
+        this.gl.vertexAttribPointer(this.shaderProgram.vertexNormalAttribute, 3, this.gl.FLOAT, false, 0, 0);
+
+        this.setMatrixUniforms();
+        this.gl.drawArrays(this.gl.TRIANGLES, 0, geometry.numVertices);
+      }
+    }    
+  }
+
   getShader(gl, id) {
     const script = document.getElementById(id);
     if (!script) return null;
