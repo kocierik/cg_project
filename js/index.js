@@ -7,8 +7,8 @@ class WebGLApp {
     this.noise_size_y;
     this.max_height;
     this.ufo_mode = false;
-    this.spaceshipGeometries = [];
-    this.numSpaceshipVertices;
+    this.coinGeometries = [];
+    this.numCoinVertices;
     this.gl;
     this.shaderProgram;
     this.pMatrix = mat4.create();
@@ -16,14 +16,14 @@ class WebGLApp {
     this.last = 0;
     this.forward = vec3.create([0, 0.9924753308296204, -0.12244734913110733]);
     this.up = vec3.create([0, 0, 1, 0]);
-    this.position = vec3.create([12, 0, 1.2, 1]);
+    this.positionActor = vec3.create([12, 0, 1.2, 1]);
     this.velocity = 0.20;
     this.vertical_angular_velocity = 0;
     this.roll_angular_velocity = 0;
     this.mountainVertexPositionBuffer;
     this.mountainVertexNormalBuffer;
-    this.spaceshipBoundingBox;
-    this.spaceshipTranslationOffset = [5, 1, -3]; 
+    this.coinBoundingBox;
+    this.coinTranslationOffset = [5, 1, -3]; 
     this.collided = false; 
     this.points = 0
   }
@@ -36,7 +36,7 @@ class WebGLApp {
     this.noise_size_x = parseFloat($('#noise_size_x').val());
     this.noise_size_y = parseFloat($('#noise_size_y').val());
     this.max_height = parseFloat($('#max_height').val());
-    this.position = vec3.create([this.terrain_size / 2, 0, 1.2, 1]);
+    this.positionActor = vec3.create([this.terrain_size / 2, 0, 1.2, 1]);
 
     // Start the program
     this.main(document.getElementById("canvas"));
@@ -108,14 +108,14 @@ class WebGLApp {
                 this.gl.bindBuffer(this.gl.ARRAY_BUFFER, normalsBuffer);
                 this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(normals), this.gl.STATIC_DRAW);
 
-                this.spaceshipGeometries.push({
+                this.coinGeometries.push({
                     verticesBuffer: verticesBuffer,
                     normalsBuffer: normalsBuffer,
                     numVertices: positions.length / 3
                 });
             }
         }
-        this.numSpaceshipVertices = this.spaceshipGeometries.reduce((total, geometry) => total + geometry.numVertices, 0);
+        this.numCoinVertices = this.coinGeometries.reduce((total, geometry) => total + geometry.numVertices, 0);
     }
 
     // Store bounding box dimensions
@@ -123,22 +123,22 @@ class WebGLApp {
         min: { x: minX, y: minY, z: minZ },
         max: { x: maxX, y: maxY, z: maxZ }
     };
-    this.spaceshipBoundingBox = boundingBox;
+    this.coinBoundingBox = boundingBox;
 }
 
 async recreateSpaceship() {
   // Remove all geometries of the current spaceship
-  this.spaceshipGeometries = [];
+  this.coinGeometries = [];
 
   // Generate new random coordinates within the bounds of the terrain
   const randomX = Math.random() * (this.size_x - this.terrain_size);
   const randomY = Math.random() * (this.size_y - this.terrain_size);
   const randomZ = 0; // Assuming the spaceship is on the surface of the terrain
-  this.spaceshipTranslationOffset = [randomX, randomY, randomZ];
+  this.coinTranslationOffset = [randomX, randomY, randomZ];
 
   // Create a new spaceship with a new position and translation
-  await this.loadSpaceshipModel(0.05, this.spaceshipTranslationOffset);
-  console.log(this.spaceshipTranslationOffset)
+  await this.loadSpaceshipModel(0.05, this.coinTranslationOffset);
+  console.log(this.coinTranslationOffset)
 
   // Reset the collision flag
   this.collided = false;
@@ -147,8 +147,8 @@ async recreateSpaceship() {
 
   async main(canvas) {
     this.initGL(canvas);
-    this.spaceshipTranslationOffset = [5, 1, -3]
-    await this.loadSpaceshipModel(0.05,this.spaceshipTranslationOffset);
+    this.coinTranslationOffset = [5, 1, -3]
+    await this.loadSpaceshipModel(0.05,this.coinTranslationOffset);
     this.initBuffers();
     this.initShaders();
 
@@ -233,17 +233,17 @@ async recreateSpaceship() {
 
 
   checkCollision() {
-    if (!this.spaceshipBoundingBox) {
+    if (!this.coinBoundingBox) {
         // Spaceship bounding box not initialized
         return false;
     }
 
-    // Get your position (assuming it's stored in this.position)
-    const myPosition = this.position;
+    // Get your position (assuming it's stored in this.positionActor)
+    const myPosition = this.positionActor;
 
     // Check for collision between your position and the spaceship's bounding box
-    const spaceshipMin = this.spaceshipBoundingBox.min;
-    const spaceshipMax = this.spaceshipBoundingBox.max;
+    const spaceshipMin = this.coinBoundingBox.min;
+    const spaceshipMax = this.coinBoundingBox.max;
 
     // Check if your position is within the bounding box of the spaceship
     if (
@@ -284,9 +284,9 @@ async recreateSpaceship() {
     if (this.last != 0) {
       const delta = (now - this.last) / 1000;
 
-      this.position[0] += delta * this.velocity * this.forward[0];
-      this.position[1] += delta * this.velocity * this.forward[1];
-      this.position[2] += delta * this.velocity * this.forward[2];
+      this.positionActor[0] += delta * this.velocity * this.forward[0];
+      this.positionActor[1] += delta * this.velocity * this.forward[1];
+      this.positionActor[2] += delta * this.velocity * this.forward[2];
 
       const n_fz = vec3.create();
       vec3.cross(this.forward, vec3.create([0, 0, 1]), n_fz);
@@ -312,46 +312,7 @@ async recreateSpaceship() {
     this.last = now;
   }
 
-  async display() {
-    this.gl.viewport(0, 0, this.gl.viewportWidth, this.gl.viewportHeight);
-    this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
-    mat4.perspective(90, this.gl.viewportWidth / this.gl.viewportHeight, 0.1, 100.0, this.pMatrix);
-
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.mountainVertexPositionBuffer);
-    this.gl.vertexAttribPointer(this.shaderProgram.vertexPositionAttribute, this.mountainVertexPositionBuffer.itemSize, this.gl.FLOAT, false, 0, 0);
-
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.mountainVertexNormalBuffer);
-    this.gl.vertexAttribPointer(this.shaderProgram.vertexNormalAttribute, 3, this.gl.FLOAT, false, 0, 0);
-
-    this.gl.uniform3f(this.shaderProgram.ambientColorUniform, 0.8, 0.6, 0.1);
-    const lightingDirection = this.ufo_mode ? this.forward : [0, 0.8944714069366455, -0.44713249802589417];
-    const adjustedLD = vec3.create();
-    vec3.normalize(lightingDirection, adjustedLD);
-    vec3.scale(adjustedLD, -1);
-    this.gl.uniform3fv(this.shaderProgram.lightingDirectionUniform, adjustedLD);
-    this.gl.uniform3f(this.shaderProgram.directionalColorUniform, 0.9, 0.9, 0.9);
-    this.gl.uniform3fv(this.shaderProgram.positionUniform, this.position);
-    this.gl.uniform3fv(this.shaderProgram.forwardUniform, this.forward);
-    this.gl.uniform3fv(this.shaderProgram.upUniform, this.up);
-
-    this.setMatrixUniforms();
-    this.gl.drawArrays(this.gl.TRIANGLES, 0, this.mountainVertexPositionBuffer.numItems);
-
-    if (this.spaceshipGeometries.length > 0) {
-      for (let i = 0; i < this.spaceshipGeometries.length; i++) {
-        const geometry = this.spaceshipGeometries[i];
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, geometry.verticesBuffer);
-        this.gl.vertexAttribPointer(this.shaderProgram.vertexPositionAttribute, 3, this.gl.FLOAT, false, 0, 0);
-
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, geometry.normalsBuffer);
-        this.gl.vertexAttribPointer(this.shaderProgram.vertexNormalAttribute, 3, this.gl.FLOAT, false, 0, 0);
-
-        this.setMatrixUniforms();
-        this.gl.drawArrays(this.gl.TRIANGLES, 0, geometry.numVertices);
-      }
-    }    
-  }
-
+  
   getShader(gl, id) {
     const script = document.getElementById(id);
     if (!script) return null;
