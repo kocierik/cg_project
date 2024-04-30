@@ -6,7 +6,7 @@ class WebGLApp {
     this.noise_size_x;
     this.noise_size_y;
     this.max_height;
-    this.ufo_mode = false;
+    this.ufo_mode;
     this.coinGeometries = [];
     this.numCoinVertices;
     this.gl;
@@ -152,7 +152,7 @@ async recreateSpaceship() {
     this.initBuffers();
     this.initShaders();
 
-    this.gl.clearColor(0.6, 0.8, 0.9, 1.0);
+    this.gl.clearColor(0.5, 0.7, 1.0, 1.0);
     this.gl.enable(this.gl.DEPTH_TEST);
 
     this.tick();
@@ -323,13 +323,15 @@ async recreateSpaceship() {
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.mountainVertexNormalBuffer);
     this.gl.vertexAttribPointer(this.shaderProgram.vertexNormalAttribute, 3, this.gl.FLOAT, false, 0, 0);
 
-    this.gl.uniform3f(this.shaderProgram.ambientColorUniform, 0.8, 0.6, 0.1);
-    const lightingDirection = this.ufo_mode ? this.forward : [0, 0.8944714069366455, -0.44713249802589417];
+    this.gl.uniform3f(this.shaderProgram.ambientColorUniform, 0.8, 0.8, 0.8);
+    const lightingDirection = ufo_mode ? this.forward : [0, 0.8944714069366455, -0.44713249802589417];
     const adjustedLD = vec3.create();
     vec3.normalize(lightingDirection, adjustedLD);
     vec3.scale(adjustedLD, -1);
     this.gl.uniform3fv(this.shaderProgram.lightingDirectionUniform, adjustedLD);
+    
     this.gl.uniform3f(this.shaderProgram.directionalColorUniform, 0.9, 0.9, 0.9);
+
     this.gl.uniform3fv(this.shaderProgram.positionUniform, this.positionActor);
     this.gl.uniform3fv(this.shaderProgram.forwardUniform, this.forward);
     this.gl.uniform3fv(this.shaderProgram.upUniform, this.up);
@@ -350,6 +352,7 @@ async recreateSpaceship() {
         this.gl.drawArrays(this.gl.TRIANGLES, 0, geometry.numVertices);
       }
     }    
+    document.getElementById('score-display').innerText = `Punteggio: ${this.points}`;
   }
 
   getShader(gl, id) {
@@ -450,9 +453,14 @@ async recreateSpaceship() {
 
 }
 
-// Usage
-const webGLApp = new WebGLApp();
-$(document).ready(() => {
-  webGLApp.initializeAndStart();
-  webGLApp.bindKeyEvents();
+$(document).ready(function(){
+  $('#start').click(function(){
+    $('#ufo_mode').change(function(){
+      ufo_mode = $(this).prop('checked');
+    });
+
+    const webGLApp = new WebGLApp();
+    webGLApp.initializeAndStart();
+    webGLApp.bindKeyEvents();
+  });
 });

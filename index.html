@@ -46,16 +46,18 @@
     <section class="p-5 flex flex-1 items-center flex-col">
       <div class="flex flex-1 gap-4">
         <label for="ufo_mode">UFO Mode:</label>
-        <input class="rounded" type="checkbox" id="ufo_mode">
+        <input class="rounded" type="checkbox" id="ufo_mode" checked>
         <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" id="audioControl">Toggle
           Audio</button>
           <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" id="fullscreenButton">Fullscreen</button>
+          <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" id="start">Start</button>
 
       </div>
 
     </section>
     <div class="flex flex-1 flex-row items-center flex-wrap">
 
+      <div id="score-display">Punteggio: 0</div>
       <div class=" flex flex-1 p-5 justify-center">
         <canvas id="canvas" width="700" height="600"></canvas>
       </div>
@@ -120,16 +122,16 @@
   </script>
 
     <script id="shader-fs-mountain" type="x-shader/x-fragment">
-        #ifdef GL_ES
-        precision highp float;
-        #endif
+      #ifdef GL_ES
+      precision highp float;
+      #endif
 
-        varying vec4 vColor;
-        varying vec3 vLightWeight;
+      varying vec4 vColor;
+      varying vec3 vLightWeight;
 
-        void main(void) {
-            gl_FragColor = vec4(vec3(0.3, 0.3, 0.3) * vLightWeight, 1.0);
-        }
+      void main(void) {
+          gl_FragColor = vec4(vec3(0.61, 0.52, 0.42) * vLightWeight, 1.0);
+      }
     </script>
   <script id="shader-vs-mountain" type="x-shader/x-vertex">
         attribute vec3 aVertexPosition;
