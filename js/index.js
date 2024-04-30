@@ -45,8 +45,9 @@ class WebGLApp {
   isPowerOf2(value) {
     return (value & (value - 1)) === 0;
   }
+
   async loadSpaceshipModel(scaleFactor, translation) {
-    const objHref = '../bitcoin.obj';
+    const objHref = '../money/money.obj'; // Sostituisci con il percorso corretto della spaceship
     // const objHref = '../spaceship/prometheus.obj';
     const response = await fetch(objHref);
     const objText = await response.text();
@@ -69,12 +70,6 @@ class WebGLApp {
                     return pos * scaleFactor;
                 });
 
-                // Apply translation
-                for (let j = 0; j < positions.length; j += 3) {
-                    positions[j] += translation[0]; // x
-                    positions[j + 1] += translation[1]; // y
-                    positions[j + 2] += translation[2]; // z
-                }
                 // Apply rotation (rotate around the y-axis by 90 degrees)
                 const rotationAngle = Math.PI / 2; // 90 degrees in radians
                 for (let j = 0; j < positions.length; j += 3) {
@@ -83,8 +78,10 @@ class WebGLApp {
                     const z = positions[j + 2];
                     positions[j] = x * Math.cos(rotationAngle) - z * Math.sin(rotationAngle);
                     positions[j + 2] = x * Math.sin(rotationAngle) + z * Math.cos(rotationAngle);
+                }
 
-                    // Apply translation
+                // Apply translation
+                for (let j = 0; j < positions.length; j += 3) {
                     positions[j] += translation[0]; // x
                     positions[j + 1] += translation[1]; // y
                     positions[j + 2] += translation[2]; // z
@@ -126,18 +123,21 @@ class WebGLApp {
     this.coinBoundingBox = boundingBox;
 }
 
+
+
 async recreateSpaceship() {
   // Remove all geometries of the current spaceship
   this.coinGeometries = [];
 
   // Generate new random coordinates within the bounds of the terrain
-  const randomX = Math.random() * (this.size_x - this.terrain_size);
-  const randomY = Math.random() * (this.size_y - this.terrain_size);
-  const randomZ = 0; // Assuming the spaceship is on the surface of the terrain
+  const randomX = Math.random() * this.terrain_size;
+  const randomY = Math.random() * this.terrain_size;
+
+  const randomZ = 2; // Assuming the spaceship is on the surface of the terrain
   this.coinTranslationOffset = [randomX, randomY, randomZ];
 
   // Create a new spaceship with a new position and translation
-  await this.loadSpaceshipModel(0.05, this.coinTranslationOffset);
+  await this.loadSpaceshipModel(0.003, this.coinTranslationOffset);
   console.log(this.coinTranslationOffset)
 
   // Reset the collision flag
@@ -147,8 +147,8 @@ async recreateSpaceship() {
 
   async main(canvas) {
     this.initGL(canvas);
-    this.coinTranslationOffset = [5, 1, -3]
-    await this.loadSpaceshipModel(0.05,this.coinTranslationOffset);
+    this.coinTranslationOffset = [6, 1, 1]
+    await this.loadSpaceshipModel(0.003,this.coinTranslationOffset);
     this.initBuffers();
     this.initShaders();
 
