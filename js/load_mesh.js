@@ -89,40 +89,44 @@
 // }
 
 
-// //Funzione che carica una texture
-// async function loadTexture(gl, path, fileName) {
-//     const texture = gl.createTexture();
-//     gl.bindTexture(gl.TEXTURE_2D, texture);
-//     const level = 0;
-//     const internalFormat = gl.RGBA;
-//     const width = 1;
-//     const height = 1;
-//     const border = 0;
-//     const srcFormat = gl.RGBA;
-//     const srcType = gl.UNSIGNED_BYTE;
-//     const pixel = new Uint8Array([255, 255, 255, 255]);  // opaque blue
-//     gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
-//         width, height, border, srcFormat, srcType, pixel);
+function isPowerOf2(value) {
+    return (value & (value - 1)) === 0;
+  }
 
-//     if(fileName){
-//         const image = new Image();
-//         image.onload = function() {
-//             gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-//             gl.bindTexture(gl.TEXTURE_2D, texture);
-//             gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,srcFormat, srcType, image);
-//             if (isPowerOf2(image.width) && isPowerOf2(image.height))
-//                 gl.generateMipmap(gl.TEXTURE_2D); // Yes, it's a power of 2. Generate mips.
-//             else {
-//                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-//                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-//                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-//                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-//             }
-//         };
-//         image.src = path + fileName;
-//     }
-//     return texture;
-// }
+//Funzione che carica una texture
+async function loadTexture(gl, path, fileName) {
+    const texture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    const level = 0;
+    const internalFormat = gl.RGBA;
+    const width = 1;
+    const height = 1;
+    const border = 0;
+    const srcFormat = gl.RGBA;
+    const srcType = gl.UNSIGNED_BYTE;
+    const pixel = new Uint8Array([255, 255, 255, 255]);  // opaque blue
+    gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
+        width, height, border, srcFormat, srcType, pixel);
+
+    if(fileName){
+        const image = new Image();
+        image.onload = function() {
+            gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+            gl.bindTexture(gl.TEXTURE_2D, texture);
+            gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,srcFormat, srcType, image);
+            if (isPowerOf2(image.width) && isPowerOf2(image.height))
+                gl.generateMipmap(gl.TEXTURE_2D); // Yes, it's a power of 2. Generate mips.
+            else {
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+            }
+        };
+        image.src = path + fileName;
+    }
+    return texture;
+}
 
 // //Funzione che utilizza la libreria glm_utils per leggere un eventuale 
 // //file MTL associato alla mesh

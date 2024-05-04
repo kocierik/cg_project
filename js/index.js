@@ -46,13 +46,145 @@ class WebGLApp {
     return (value & (value - 1)) === 0;
   }
 
-  async loadSpaceshipModel(scaleFactor, translation) {
-    const objHref = '../money/money.obj'; // Sostituisci con il percorso corretto della spaceship
-    // const objHref = '../spaceship/prometheus.obj';
-    const response = await fetch(objHref);
-    const objText = await response.text();
-    const objData = parseOBJ(objText);
 
+ createTexture(url) {
+  const texture = create1PixelTexture(this.gl, [128, 192, 255, 255]);
+  // Asynchronously load an image
+  const image = new Image();
+  image.src = url;
+  image.addEventListener('load', function() {
+    // Now that the image has loaded make copy it to the texture.
+    this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
+    this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, true);
+    this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA,this.gl.UNSIGNED_BYTE, image);
+
+    // Check if the image is a power of 2 in both dimensions.
+    if (isPowerOf2(image.width) && isPowerOf2(image.height)) {
+       // Yes, it's a power of 2. Generate mips.
+       this.gl.generateMipmap(this.gl.TEXTURE_2D);
+    } else {
+       // No, it's not a power of 2. Turn of mips and set wrapping to clamp to edge
+       this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
+       this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
+       this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
+    }
+  });
+  return texture;
+}
+
+
+
+
+ parseMTL(text) {
+    const materials = {};
+    let material;
+
+    const keywords = {
+        newmtl(parts, unparsedArgs) {
+            material = {};
+            materials[unparsedArgs] = material;
+        },
+        /* eslint brace-style:0 */
+        Ns(parts)       { material.shininess      = parseFloat(parts[0]); },
+        Ka(parts)       { material.ambient        = parts.map(parseFloat); },
+        Kd(parts)       { material.diffuse        = parts.map(parseFloat); },
+        Ks(parts)       { material.specular       = parts.map(parseFloat); },
+        Ke(parts)       { material.emissive       = parts.map(parseFloat); },
+        map_Kd(parts, unparsedArgs)   { material.diffuseMap = unparsedArgs; },
+        map_Ns(parts, unparsedArgs)   { material.specularMap = unparsedArgs; },
+        map_Bump(parts, unparsedArgs) { material.normalMap = unparsedArgs; },
+        Ni(parts)       { material.opticalDensity = parseFloat(parts[0]); },
+        d(parts)        { material.opacity        = parseFloat(parts[0]); },
+        illum(parts)    { material.illum          = parseInt(parts[0]); },
+    };
+
+    const keywordRE = /(\w*)(?: )*(.*)/;
+    const lines = text.split('\n');
+    for (let lineNo = 0; lineNo < lines.length; ++lineNo) {
+        const line = lines[lineNo].trim();
+        if (line === '' || line.startsWith('#')) {
+            continue;
+        }
+        const m = keywordRE.exec(line);
+        if (!m) {
+            continue;
+        }
+        const [, keyword, unparsedArgs] = m;
+        const parts = line.split(/\s+/).slice(1);
+        const handler = keywords[keyword];
+        if (!handler) {
+            console.warn('unhandled keyword:', keyword);  // eslint-disable-line no-console
+            continue;
+        }
+        handler(parts, unparsedArgs);
+    }
+
+    return materials;
+}
+
+
+
+setMaterialProperties(material) {
+  if (!material) {
+      console.error("Material is undefined");
+      return;
+  }
+
+  // Set diffuse color
+  if (material.diffuse) {
+      const [r, g, b] = material.diffuse;
+      this.gl.uniform3f(this.gl.getUniformLocation(this.shaderProgram, "uDiffuseColor"), r, g, b);
+  } else {
+      console.error("Diffuse color not found in material:", material);
+  }
+
+  // Set specular color
+  if (material.specular) {
+      const [r, g, b] = material.specular;
+      this.gl.uniform3f(this.gl.getUniformLocation(this.shaderProgram, "uSpecularColor"), r, g, b);
+  } else {
+      console.error("Specular color not found in material:", material);
+  }
+
+  // Set shininess
+  if (material.shininess !== undefined) {
+      this.gl.uniform1f(this.gl.getUniformLocation(this.shaderProgram, "uShininess"), material.shininess);
+  } else {
+      console.error("Shininess not found in material:", material);
+  }
+
+}
+
+async loadSpaceshipModel(scaleFactor, translation) {
+  const objHref = '../solar.obj'; // Sostituisci con il percorso corretto del file OBJ
+  const mtlHref = '../solar.mtl'; // Sostituisci con il percorso corretto del file MTL
+
+  // Carica il file MTL
+  const mtlResponse = await fetch(mtlHref);
+  const mtlText = await mtlResponse.text();
+  const mtlData = this.parseMTL(mtlText); // Devi implementare la funzione parseMTL
+
+  // Carica il file OBJ
+  const objResponse = await fetch(objHref);
+  const objText = await objResponse.text();
+  const objData = parseOBJ(objText);
+
+  // Continua solo se sia l'OBJ che l'MTL sono stati caricati correttamente
+  if (objData && objData.geometries && objData.geometries.length > 0 && mtlData) {
+    // Itera sui materiali nel file MTL
+    for (const materialName in mtlData) {
+      // console.log(materialName)
+      const material = mtlData[materialName];
+      // Associa il materiale ai vertici corrispondenti nell'OBJ
+      for (let i = 0; i < objData.geometries.length; i++) {
+        const geometry = objData.geometries[i];
+        if (geometry.material === materialName) {
+          geometry.material = material;
+        }
+      }
+    }
+
+    // Continua il caricamento del modello OBJ
     let minX = Infinity;
     let minY = Infinity;
     let minZ = Infinity;
@@ -61,66 +193,74 @@ class WebGLApp {
     let maxZ = -Infinity;
 
     if (objData && objData.geometries && objData.geometries.length > 0) {
-        for (let i = 0; i < objData.geometries.length; i++) {
-            const geometry = objData.geometries[i];
-            const data = geometry.data;
-            if (data.position && data.normal) {
-                const positions = data.position.map((pos, index) => {
-                    // Scale each coordinate by scaleFactor
-                    return pos * scaleFactor;
-                });
+      for (let i = 0; i < objData.geometries.length; i++) {
+        const geometry = objData.geometries[i];
+        const data = geometry.data;
+        if (data.position && data.normal) {
+          const positions = data.position.map((pos, index) => {
+            // Scale each coordinate by scaleFactor
+            return pos * scaleFactor;
+          });
 
-                // Apply rotation (rotate around the y-axis by 90 degrees)
-                const rotationAngle = Math.PI / 2; // 90 degrees in radians
-                for (let j = 0; j < positions.length; j += 3) {
-                    // Rotate each vertex position
-                    const x = positions[j];
-                    const z = positions[j + 2];
-                    positions[j] = x * Math.cos(rotationAngle) - z * Math.sin(rotationAngle);
-                    positions[j + 2] = x * Math.sin(rotationAngle) + z * Math.cos(rotationAngle);
-                }
+          // Apply rotation (rotate around the y-axis by 90 degrees)
+          const rotationAngle = Math.PI / 2; // 90 degrees in radians
+          for (let j = 0; j < positions.length; j += 3) {
+            // Rotate each vertex position
+            const x = positions[j];
+            const z = positions[j + 2];
+            positions[j] = x * Math.cos(rotationAngle) - z * Math.sin(rotationAngle);
+            positions[j + 2] = x * Math.sin(rotationAngle) + z * Math.cos(rotationAngle);
+          }
 
-                // Apply translation
-                for (let j = 0; j < positions.length; j += 3) {
-                    positions[j] += translation[0]; // x
-                    positions[j + 1] += translation[1]; // y
-                    positions[j + 2] += translation[2]; // z
+          // Apply translation
+          for (let j = 0; j < positions.length; j += 3) {
+            positions[j] += translation[0]; // x
+            positions[j + 1] += translation[1]; // y
+            positions[j + 2] += translation[2]; // z
 
-                    // Update bounding box coordinates
-                    minX = Math.min(minX, positions[j]);
-                    minY = Math.min(minY, positions[j + 1]);
-                    minZ = Math.min(minZ, positions[j + 2]);
-                    maxX = Math.max(maxX, positions[j]);
-                    maxY = Math.max(maxY, positions[j + 1]);
-                    maxZ = Math.max(maxZ, positions[j + 2]);
-                }
+            // Update bounding box coordinates
+            minX = Math.min(minX, positions[j]);
+            minY = Math.min(minY, positions[j + 1]);
+            minZ = Math.min(minZ, positions[j + 2]);
+            maxX = Math.max(maxX, positions[j]);
+            maxY = Math.max(maxY, positions[j + 1]);
+            maxZ = Math.max(maxZ, positions[j + 2]);
+          }
 
-                const normals = data.normal;
+          const normals = data.normal;
 
-                const verticesBuffer = this.gl.createBuffer();
-                this.gl.bindBuffer(this.gl.ARRAY_BUFFER, verticesBuffer);
-                this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(positions), this.gl.STATIC_DRAW);
+          const verticesBuffer = this.gl.createBuffer();
+          this.gl.bindBuffer(this.gl.ARRAY_BUFFER, verticesBuffer);
+          this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(positions), this.gl.STATIC_DRAW);
 
-                const normalsBuffer = this.gl.createBuffer();
-                this.gl.bindBuffer(this.gl.ARRAY_BUFFER, normalsBuffer);
-                this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(normals), this.gl.STATIC_DRAW);
+          const normalsBuffer = this.gl.createBuffer();
+          this.gl.bindBuffer(this.gl.ARRAY_BUFFER, normalsBuffer);
+          this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(normals), this.gl.STATIC_DRAW);
 
-                this.coinGeometries.push({
-                    verticesBuffer: verticesBuffer,
-                    normalsBuffer: normalsBuffer,
-                    numVertices: positions.length / 3
-                });
-            }
+          // Retrieve material information from MTL
+          const material = geometry.material;
+
+          this.coinGeometries.push({
+            verticesBuffer: verticesBuffer,
+            normalsBuffer: normalsBuffer,
+            numVertices: positions.length / 3,
+            material: material // Aggiungi il materiale al geometria
+          });
         }
-        this.numCoinVertices = this.coinGeometries.reduce((total, geometry) => total + geometry.numVertices, 0);
+      }
+      this.numCoinVertices = this.coinGeometries.reduce((total, geometry) => total + geometry.numVertices, 0);
     }
 
     // Store bounding box dimensions
     const boundingBox = {
-        min: { x: minX, y: minY, z: minZ },
-        max: { x: maxX, y: maxY, z: maxZ }
+      min: { x: minX, y: minY, z: minZ },
+      max: { x: maxX, y: maxY, z: maxZ }
     };
     this.coinBoundingBox = boundingBox;
+
+  } else {
+    console.error('Failed to load OBJ or MTL file.');
+  }
 }
 
 
@@ -137,8 +277,7 @@ async recreateSpaceship() {
   this.coinTranslationOffset = [randomX, randomY, randomZ];
 
   // Create a new spaceship with a new position and translation
-  await this.loadSpaceshipModel(0.003, this.coinTranslationOffset);
-  console.log(this.coinTranslationOffset)
+  await this.loadSpaceshipModel(0.03, this.coinTranslationOffset);
 
   // Reset the collision flag
   this.collided = false;
@@ -148,9 +287,10 @@ async recreateSpaceship() {
   async main(canvas) {
     this.initGL(canvas);
     this.coinTranslationOffset = [6, 1, 1]
-    await this.loadSpaceshipModel(0.003,this.coinTranslationOffset);
     this.initBuffers();
     this.initShaders();
+    
+    await this.loadSpaceshipModel(0.03,this.coinTranslationOffset);
 
     this.gl.clearColor(0.5, 0.7, 1.0, 1.0);
     this.gl.enable(this.gl.DEPTH_TEST);
@@ -338,20 +478,25 @@ async recreateSpaceship() {
 
     this.setMatrixUniforms();
     this.gl.drawArrays(this.gl.TRIANGLES, 0, this.mountainVertexPositionBuffer.numItems);
-
     if (this.coinGeometries.length > 0) {
       for (let i = 0; i < this.coinGeometries.length; i++) {
         const geometry = this.coinGeometries[i];
+        const material = geometry.material;
+        // Set material properties
+        this.setMaterialProperties(material);
+  
+        // Bind vertex buffers
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, geometry.verticesBuffer);
         this.gl.vertexAttribPointer(this.shaderProgram.vertexPositionAttribute, 3, this.gl.FLOAT, false, 0, 0);
-
+  
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, geometry.normalsBuffer);
         this.gl.vertexAttribPointer(this.shaderProgram.vertexNormalAttribute, 3, this.gl.FLOAT, false, 0, 0);
-
+  
+        // Draw geometry
         this.setMatrixUniforms();
         this.gl.drawArrays(this.gl.TRIANGLES, 0, geometry.numVertices);
       }
-    }    
+    } 
     document.getElementById('score-display').innerText = `Punteggio: ${this.points}`;
   }
 

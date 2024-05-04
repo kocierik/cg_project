@@ -121,6 +121,53 @@
     }
   </script>
 
+  <script id="shader-vs-try" type="x-shader/x-vertex">
+      precision mediump float;
+
+      // Attributes
+      attribute vec3 aVertexPosition;
+      attribute vec3 aVertexNormal;
+
+      // Uniforms
+      uniform mat4 uPMatrix;
+      uniform vec3 uLightingDirection;
+      uniform vec3 uPosition;
+      uniform vec3 uForward;
+      uniform vec3 uUp;
+
+      // Varying
+      varying vec3 vLighting;
+
+      void main(void) {
+        // Transform vertex position
+        vec4 position = uPMatrix * vec4(aVertexPosition, 1.0);
+        gl_Position = position;
+
+        // Calculate lighting
+        vec3 transformedNormal = normalize(mat3(uPMatrix) * aVertexNormal);
+        float directionalLightWeighting = max(dot(transformedNormal, uLightingDirection), 0.0);
+        vLighting = vec3(1.0, 1.0, 1.0) * directionalLightWeighting;
+      }
+</script>
+
+<script id="shader-fs-try" type="x-shader/x-fragment">
+      // Shader fragment
+      precision mediump float;
+
+      // Varying
+      varying vec3 vLighting;
+
+      void main(void) {
+        // Set the base color
+        vec3 baseColor = vec3(0.6, 0.8, 1.0);
+
+        // Combine base color with lighting
+        vec3 finalColor = baseColor * vLighting;
+
+        gl_FragColor = vec4(finalColor, 1.0);
+      }
+  </script>
+
     <script id="shader-fs-mountain" type="x-shader/x-fragment">
       #ifdef GL_ES
       precision highp float;
