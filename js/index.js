@@ -46,9 +46,8 @@ class WebGLApp {
     return (value & (value - 1)) === 0;
   }
 
-  async loadSpaceshipModel(scaleFactor, translation) {
-    const objHref = '../money/money.obj'; // Sostituisci con il percorso corretto della spaceship
-    // const objHref = '../spaceship/prometheus.obj';
+  async loadModel(scaleFactor, translation) {
+    const objHref = '../money/money.obj'; 
     const response = await fetch(objHref);
     const objText = await response.text();
     const objData = parseOBJ(objText);
@@ -125,19 +124,16 @@ class WebGLApp {
 
 
 
-async recreateSpaceship() {
-  // Remove all geometries of the current spaceship
+async recreateModel() {
   this.coinGeometries = [];
 
-  // Generate new random coordinates within the bounds of the terrain
   const randomX = Math.random() * this.terrain_size;
   const randomY = Math.random() * this.terrain_size;
 
-  const randomZ = 2; // Assuming the spaceship is on the surface of the terrain
+  const randomZ = 2; 
   this.coinTranslationOffset = [randomX, randomY, randomZ];
 
-  // Create a new spaceship with a new position and translation
-  await this.loadSpaceshipModel(0.003, this.coinTranslationOffset);
+  await this.loadModel(0.003, this.coinTranslationOffset);
   console.log(this.coinTranslationOffset)
 
   // Reset the collision flag
@@ -148,7 +144,7 @@ async recreateSpaceship() {
   async main(canvas) {
     this.initGL(canvas);
     this.coinTranslationOffset = [6, 1, 1]
-    await this.loadSpaceshipModel(0.003,this.coinTranslationOffset);
+    await this.loadModel(0.003,this.coinTranslationOffset);
     this.initBuffers();
     this.initShaders();
 
@@ -234,22 +230,19 @@ async recreateSpaceship() {
 
   checkCollision() {
     if (!this.coinBoundingBox) {
-        // Spaceship bounding box not initialized
         return false;
     }
 
     // Get your position (assuming it's stored in this.positionActor)
     const myPosition = this.positionActor;
 
-    // Check for collision between your position and the spaceship's bounding box
-    const spaceshipMin = this.coinBoundingBox.min;
-    const spaceshipMax = this.coinBoundingBox.max;
+    const modelMin = this.coinBoundingBox.min;
+    const modelMax = this.coinBoundingBox.max;
 
-    // Check if your position is within the bounding box of the spaceship
     if (
-        myPosition[0] >= spaceshipMin.x && myPosition[0] <= spaceshipMax.x &&
-        myPosition[1] >= spaceshipMin.y && myPosition[1] <= spaceshipMax.y &&
-        myPosition[2] >= spaceshipMin.z && myPosition[2] <= spaceshipMax.z
+        myPosition[0] >= modelMin.x && myPosition[0] <= modelMax.x &&
+        myPosition[1] >= modelMin.y && myPosition[1] <= modelMax.y &&
+        myPosition[2] >= modelMin.z && myPosition[2] <= modelMax.z
     ) {
         // Collision detected
         this.points += 1
@@ -276,7 +269,7 @@ async recreateSpaceship() {
           // Esegui altre azioni in risposta alla collisione, se necessario
           
           this.collided = true;
-          await this.recreateSpaceship();
+          await this.recreateModel();
         }
       }
 
