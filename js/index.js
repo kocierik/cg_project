@@ -18,6 +18,7 @@ class WebGLApp {
     this.up = vec3.create([0, 0, 1, 0]);
     this.positionActor = vec3.create([12, 0, 1.2, 1]);
     this.velocity = 0.20;
+    this.objSize = 0.003
     this.vertical_angular_velocity = 0;
     this.roll_angular_velocity = 0;
     this.mountainVertexPositionBuffer;
@@ -133,7 +134,7 @@ async recreateModel() {
   const randomZ = 2; 
   this.coinTranslationOffset = [randomX, randomY, randomZ];
 
-  await this.loadModel(0.003, this.coinTranslationOffset);
+  await this.loadModel(this.objSize, this.coinTranslationOffset);
   console.log(this.coinTranslationOffset)
 
   // Reset the collision flag
@@ -144,7 +145,7 @@ async recreateModel() {
   async main(canvas) {
     this.initGL(canvas);
     this.coinTranslationOffset = [6, 1, 1]
-    await this.loadModel(0.003,this.coinTranslationOffset);
+    await this.loadModel(this.objSize,this.coinTranslationOffset);
     this.initBuffers();
     this.initShaders();
 
