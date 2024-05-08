@@ -79,6 +79,8 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
   <script src="https://webglfundamentals.org/webgl/resources/m4.js"></script>
   <script src="lib/webgl-utils.js"></script>
+  <script src="https://webglfundamentals.org/webgl/resources/webgl-utils.js"></script>
+
   <script src="lib/gl-matrix-min.js"></script>
   <script src="js/mountain.js"></script>
   <!-- <script src="./js/utils/handlekey.js"></script> -->
@@ -87,39 +89,37 @@
   <script src="js/load_mesh.js"></script>
   <script src="js/spaceship.js"></script>
 
-
-  <script id="shader-vs-spaceship" type="x-shader/x-vertex">
-    attribute vec4 aVertexColor; 
-
+  <script id="shader-fs-planet" type="x-shader/x-fragment">
+    precision mediump float;
+    varying vec3 vLightWeighting;
+    void main(void) {
+        gl_FragColor = vec4(vLightWeighting, 1.0);
+    }
+  </script>
+  <script id="shader-vs-planet" type="x-shader/x-vertex">
     attribute vec3 aVertexPosition;
     attribute vec3 aVertexNormal;
 
-    uniform mat4 uPMatrix;
     uniform mat4 uMVMatrix;
-    uniform mat3 uNMatrix;
+    uniform mat4 uPMatrix;
+    uniform vec3 uLightingDirection;
+    uniform vec3 uAmbientColor;
+    uniform vec3 uDirectionalColor;
 
-    varying vec3 vTransformedNormal;
-    varying vec4 vPosition;
-    varying vec4 vColor;
+    varying vec3 vLightWeighting;
 
     void main(void) {
-        // Passaggio dei dati relativi alla posizione e alla normale al fragment shader
-        vTransformedNormal = uNMatrix * aVertexNormal;
-        vPosition = uMVMatrix * vec4(aVertexPosition, 1.0);
-        vColor = aVertexColor; // Passaggio del colore al fragment shader
         gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
-    }
 
-  </script>
-  <script id="shader-fs-spaceship" type="x-shader/x-fragment">
-    precision mediump float;
+        // Normal matrix for transforming normals in world space
+        mat3 normalMatrix = mat3(uMVMatrix);
+        vec3 transformedNormal = normalize(normalMatrix * aVertexNormal);
 
-    varying vec4 vColor; // Riceve il colore dal vertex shader
-
-    void main(void) {
-        gl_FragColor = vColor; // Passa il colore direttamente al pixel del fragment
+        float directionalLightWeighting = max(dot(transformedNormal, uLightingDirection), 0.0);
+        vLightWeighting = uAmbientColor + uDirectionalColor * directionalLightWeighting;
     }
   </script>
+
 
     <script id="shader-fs-mountain" type="x-shader/x-fragment">
       #ifdef GL_ES
