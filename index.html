@@ -1,190 +1,94 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Progetto Computer Graphics 2024</title>
-  <link rel="stylesheet" href="css/index.css">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://twgljs.org/dist/4.x/twgl-full.min.js"></script>
-</head>
-
-<body>
-  <div class="flex flex-1 flex-col ">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <button id="fullscreenButton">FullScreen</button>
+    <button id="audioControl">Play Audio</button>
+    <button id="toggle-lights-button">Light</button>
     <audio id="backgroundAudio" src="airplane.mp3" loop></audio>
-    <header class="flex flex-1 justify-center p-5">
-      <div class="text-3xl font-bold">Airplane Navigator</div>
-    </header>
-    <div class="grid grid-rows-2 grid-flow-col gap-4">
-      <div>
-        <label for="terrain_size">Terrain size:</label>
-        <input class="rounded  p-1 border border-sky-300" type="text" id="terrain_size" value="12.0">
-      </div>
-      <div>
-        <label for="size_x">Noise Samples X:</label>
-        <input class="rounded  p-1 border border-sky-300" type="text" id="size_x" value="400">
-      </div>
-      <div>
-        <label for="size_y">Noise Samples Y:</label>
-        <input class="rounded-lg p-1 border border-sky-300" type="text" id="size_y" value="400">
-      </div>
-      <div>
-        <label for="noise_size_x">Noise Data Points X:</label>
-        <input class="rounded-lg p-1 border border-sky-300" type="text" id="noise_size_x" value="100">
-      </div>
-      <div>
-        <label for="noise_size_y">Noise Data Points Y:</label>
-        <input class="rounded  p-1 border border-sky-300" type="text" id="noise_size_y" value="100">
-      </div>
-      <div>
-        <label for="max_height">Mountain Height:</label>
-        <input class="rounded  p-1 border border-sky-300" type="text" id="max_height" value="1.5">
-      </div>
-    </div>
-
-    <section class="p-5 flex flex-1 items-center flex-col">
-      <div class="flex flex-1 gap-4">
-        <label for="ufo_mode">UFO Mode:</label>
-        <input class="rounded" type="checkbox" id="ufo_mode" checked>
-        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" id="audioControl">Toggle
-          Audio</button>
-          <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" id="fullscreenButton">Fullscreen</button>
-          <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" id="start">Start</button>
-
-      </div>
-
-    </section>
-    <div class="flex flex-1 flex-row items-center flex-wrap">
-
-      <div id="score-display">Punteggio: 0</div>
-      <div class=" flex flex-1 p-5 justify-center">
-        <canvas id="canvas" width="700" height="600"></canvas>
-      </div>
-      <div id="directionalButtons" class="flex flex-col ">
-        <div class="flex">
-          <div class="arrow-key plus" data-key="187"></div>
-          <div class="arrow-key minus" data-key="189"></div>
-        </div>
-        <div class="arrow-key-container ">
-          <div class="arrow-key up" data-key="87"></div><br>
-          <div class="arrow-key left" data-key="65"></div>
-          <div class="arrow-key down" data-key="83"></div>
-          <div class="arrow-key right" data-key="68"></div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-  <script src="https://webglfundamentals.org/webgl/resources/m4.js"></script>
-  <script src="lib/webgl-utils.js"></script>
-  <script src="https://webglfundamentals.org/webgl/resources/webgl-utils.js"></script>
-
-  <script src="lib/gl-matrix-min.js"></script>
-  <script src="js/mountain.js"></script>
-  <!-- <script src="./js/utils/handlekey.js"></script> -->
-  <script src="js/utils/fullscreenAudio.js"></script>
-  <script src="js/index.js"></script>
-  <script src="js/load_mesh.js"></script>
-  <script src="js/spaceship.js"></script>
-
-  <script id="shader-fs-planet" type="x-shader/x-fragment">
-    precision mediump float;
-    varying vec3 vLightWeighting;
-    void main(void) {
-        gl_FragColor = vec4(vLightWeighting, 1.0);
-    }
-  </script>
-  <script id="shader-vs-planet" type="x-shader/x-vertex">
-    attribute vec3 aVertexPosition;
-    attribute vec3 aVertexNormal;
-
-    uniform mat4 uMVMatrix;
-    uniform mat4 uPMatrix;
-    uniform vec3 uLightingDirection;
-    uniform vec3 uAmbientColor;
-    uniform vec3 uDirectionalColor;
-
-    varying vec3 vLightWeighting;
-
-    void main(void) {
-        gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
-
-        // Normal matrix for transforming normals in world space
-        mat3 normalMatrix = mat3(uMVMatrix);
-        vec3 transformedNormal = normalize(normalMatrix * aVertexNormal);
-
-        float directionalLightWeighting = max(dot(transformedNormal, uLightingDirection), 0.0);
-        vLightWeighting = uAmbientColor + uDirectionalColor * directionalLightWeighting;
-    }
-  </script>
-
-
-    <script id="shader-fs-mountain" type="x-shader/x-fragment">
-      #ifdef GL_ES
-      precision highp float;
-      #endif
-
-      varying vec4 vColor;
-      varying vec3 vLightWeight;
-
-      void main(void) {
-          gl_FragColor = vec4(vec3(0.61, 0.52, 0.42) * vLightWeight, 1.0);
+    <canvas id="canvas"></canvas>
+    <!--
+for most samples webgl-utils only provides shader compiling/linking and
+canvas resizing because why clutter the examples with code that's the same in every sample.
+See https://webglfundamentals.org/webgl/lessons/webgl-boilerplate.html
+and https://webglfundamentals.org/webgl/lessons/webgl-resizing-the-canvas.html
+for webgl-utils, m3, m4, and webgl-lessons-ui.
+-->
+    <script id="vertex-shader-3d" type="x-shader/x-vertex">
+      attribute vec4 a_position;
+      varying vec4 v_position;
+      void main() {
+        v_position = a_position;
+        gl_Position = a_position;
+        gl_Position.z = 1.0;
       }
     </script>
-  <script id="shader-vs-mountain" type="x-shader/x-vertex">
-        attribute vec3 aVertexPosition;
-        attribute vec3 aVertexNormal;
+    <!-- fragment shader -->
+    <script id="fragment-shader-3d" type="x-shader/x-fragment">
+      precision mediump float;
 
-        uniform mat4 uPMatrix;
-        uniform mat3 uNMatrix;
+      uniform samplerCube u_skybox;
+      uniform mat4 u_viewDirectionProjectionInverse;
 
-        uniform vec3 uAmbientColor;
+      varying vec4 v_position;
+      void main() {
+        vec4 t = u_viewDirectionProjectionInverse * v_position;
+        gl_FragColor = textureCube(u_skybox, normalize(t.xyz / t.w));
+      }
+    </script>
 
-        uniform vec3 uLightingDirection;
-        uniform vec3 uDirectionalColor;
+    <script src="https://webglfundamentals.org/webgl/resources/webgl-utils.js"></script>
+    <script src="https://webglfundamentals.org/webgl/resources/m4.js"></script>
+    <script src="https://webglfundamentals.org/webgl/resources/m3.js"></script>
+    <script src="index.js"></script>
 
-        varying vec3 vLightWeight;
+    <script src="index2.js"></script>
 
-        uniform vec3 uPosition;
-        uniform vec3 uForward;
-        uniform vec3 uUp;
+    <!-- <script src="./js/utils/handlekey.js"></script>
+    <script src="js/utils/fullscreenAudio.js"></script> -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
-        void main(void) {
-			vec3 v = uForward;
-			vec3 u = uUp;
-			vec3 rprime = normalize(cross(v, u));
-			vec3 uprime = cross(rprime, v);
-			mat4 lookatTranslate = mat4(1.0);
-			lookatTranslate[3].xyz = -uPosition;
-			mat4 lookatRotate = mat4(rprime.x, uprime.x, -v.x, 0,
-									 rprime.y, uprime.y, -v.y, 0,
-									 rprime.z, uprime.z, -v.z, 0,
-									 0, 0, 0, 1);
-			mat4 lookatMatrix = lookatRotate * lookatTranslate;
-		
-			gl_Position = uPMatrix * lookatMatrix * vec4(aVertexPosition, 1.0);
+    <script>
+      var audio = document.getElementById("backgroundAudio");
+      var audioControlButton = document.getElementById("audioControl");
 
-            float directionalLightWeight = max(dot(aVertexNormal, uLightingDirection), 0.0);
-            vLightWeight = uAmbientColor + uDirectionalColor * directionalLightWeight;
+      audioControlButton.addEventListener("click", function () {
+        if (audio.paused) {
+          audio.play();
+          audioControlButton.textContent = "Pause Audio";
+        } else {
+          audio.pause();
+          audioControlButton.textContent = "Play Audio";
         }
+      });
     </script>
-  <script>
-    var audio = document.getElementById("backgroundAudio");
-    var audioControlButton = document.getElementById("audioControl");
 
-    audioControlButton.addEventListener("click", function () {
-      if (audio.paused) {
-        audio.play();
-        audioControlButton.textContent = "Pause Audio";
-      } else {
-        audio.pause();
-        audioControlButton.textContent = "Play Audio";
-      }
-    });
-    
-  </script>
-</body>
+    <script>
+      var fullscreenButton = document.getElementById("fullscreenButton");
 
+      // Aggiungi un listener per il click sul bottone
+      fullscreenButton.addEventListener("click", function () {
+        var canvas = document.getElementById("canvas");
+
+        // Controlla se il browser supporta la modalità fullscreen
+        if (document.fullscreenEnabled) {
+          // Richiedi la modalità fullscreen per il canvas
+          canvas.requestFullscreen();
+        } else {
+          alert("Fullscreen non supportato dal browser.");
+        }
+      });
+
+      const toggleLightsButton = document.querySelector("#toggle-lights-button");
+      toggleLightsButton.addEventListener("click", () => {
+        lightsEnabled = !lightsEnabled; // Cambia lo stato delle luci
+      });
+
+    </script>
+  </body>
 </html>
