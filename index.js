@@ -319,7 +319,7 @@ function generateTangents(position, texcoord, indices) {
   return tangents;
 }
 
-async function loadModel(objHref, resizeObj,positionObj,rotation,rotatePosition, spaceship, velocity) {
+async function loadModel(objHref, resizeObj,positionObj,rotation,rotatePosition, spaceship, velocity,reflection) {
   // Get A WebGL context
   /** @type {HTMLCanvasElement} */
   const canvas = document.querySelector("#canvas");
@@ -559,57 +559,94 @@ async function loadModel(objHref, resizeObj,positionObj,rotation,rotatePosition,
     return deg * Math.PI / 180;
   }
 
-// Add variables to store the state of the keys
+// Variabili per memorizzare lo stato dei tasti
 const keys = {
   w: false,
   a: false,
   s: false,
   d: false,
-  q: false,
-  e: false,
   ArrowUp: false,
   ArrowDown: false,
   ArrowLeft: false,
   ArrowRight: false
 };
 
-// Add event listeners for keydown and keyup events
+// Event listeners per i tasti
 window.addEventListener('keydown', handleKeyDown);
 window.addEventListener('keyup', handleKeyUp);
 
 function handleKeyDown(event) {
-  keys[event.key] = true;
+  const key = event.key.toLowerCase();
+  if (keys.hasOwnProperty(key)) {
+    keys[key] = true;
+    updateCameraPosition();
+  }
 }
 
 function handleKeyUp(event) {
-  keys[event.key] = false;
+  const key = event.key.toLowerCase();
+    keys[key] = false;
+    updateCameraPosition();
 }
 
-// Define a function to update camera position based on key presses
-function updateCameraPosition(velocity) {
-  if (keys.w) {
-    m4.translate(cameraPositionMain,0,0,-velocity,cameraPositionMain)
+// Event listeners per i bottoni direzionali
+document.querySelectorAll(".arrow-key").forEach(function(button) {
+  const keyCode = button.getAttribute("data-key");
+  
+  button.addEventListener("mousedown", function(e) {
+    keys[keyCode] = true;
+    updateCameraPosition();
+  });
+  
+  button.addEventListener("mouseup", function(e) {
+    keys[keyCode] = false;
+    updateCameraPosition();
+  });
+
+  button.addEventListener("mouseout", function(e) {
+    keys[keyCode] = false;
+    updateCameraPosition();
+  });
+});
+
+// Funzione per aggiornare la posizione della camera in base ai tasti premuti
+function updateCameraPosition() {
+  const velocity = 10; // Velocità del movimento
+  if (keys['w']) {
+    m4.translate(cameraPositionMain, 0, 0, -velocity, cameraPositionMain);
   }
-  if (keys.a) {
-    m4.translate(cameraPositionMain,-velocity,0,0,cameraPositionMain)
+  if (keys['a']) {
+    m4.translate(cameraPositionMain, -velocity, 0, 0, cameraPositionMain);
   }
-  if (keys.s) {
-    m4.translate(cameraPositionMain,0,0,velocity,cameraPositionMain)
+  if (keys['s']) {
+    m4.translate(cameraPositionMain, 0, 0, velocity, cameraPositionMain);
   }
-  if (keys.d) {
-    m4.translate(cameraPositionMain,velocity,0,0,cameraPositionMain)
+  if (keys['d']) {
+    m4.translate(cameraPositionMain, velocity, 0, 0, cameraPositionMain);
   }
-  if (keys.ArrowUp) {
-    m4.translate(cameraPositionMain,0,velocity,0,cameraPositionMain)
+  if (keys['ArrowUp']) {
+    m4.translate(cameraPositionMain, 0, velocity, 0, cameraPositionMain);
   }
-  if (keys.ArrowDown) {
-    m4.translate(cameraPositionMain,0,-velocity,0,cameraPositionMain)
+  if (keys['ArrowDown']) {
+    m4.translate(cameraPositionMain, 0, -velocity, 0, cameraPositionMain);
   }
-  if (keys.ArrowLeft) {
-    m4.yRotate(cameraPositionMain,degToRad(1),cameraPositionMain)
+  if (keys['ArrowLeft']) {
+    m4.yRotate(cameraPositionMain, degToRad(1), cameraPositionMain);
   }
-  if (keys.ArrowRight) {
-    m4.yRotate(cameraPositionMain,degToRad(-1),cameraPositionMain)
+  if (keys['ArrowRight']) {
+    m4.yRotate(cameraPositionMain, degToRad(-1), cameraPositionMain);
+  }
+  if (keys['arrowup']) {
+    m4.translate(cameraPositionMain, 0, velocity, 0, cameraPositionMain);
+  }
+  if (keys['arrowdown']) {
+    m4.translate(cameraPositionMain, 0, -velocity, 0, cameraPositionMain);
+  }
+  if (keys['arrowleft']) {
+    m4.yRotate(cameraPositionMain, degToRad(1), cameraPositionMain);
+  }
+  if (keys['arrowright']) {
+    m4.yRotate(cameraPositionMain, degToRad(-1), cameraPositionMain);
   }
 }
 
@@ -651,20 +688,19 @@ function render(time) {
   const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
   const projection = m4.perspective(fieldOfViewRadians, aspect, zNear, zFar);
   
-  const up = [0, 1, 0];
+  // const up = [0, 1, 0];
   var sharedUniforms
   // Compute the camera's matrix using look at.
-  if(spaceship){
-    viewMatrixMain = m4.inverse(spaceshipCamera);
-    sharedUniforms = {
-      u_lightDirection: m4.normalize([-1, 3, 5]),
-      u_lightsEnabled: lightsEnabled ? 1 : 0, // Converte il booleano in un valore intero 0 o 1
-      u_view: viewMatrixMain,
-      u_projection: projection,
-      u_viewWorldPosition: spaceshipCamera,
-    };
-    
-  } else{
+  viewMatrixMain = m4.inverse(spaceshipCamera);
+  sharedUniforms = {
+    u_lightDirection: m4.normalize([-1, 3, 5]),
+    u_lightsEnabled: lightsEnabled ? 1 : 0, 
+    u_view: viewMatrixMain,
+    u_projection: projection,
+    u_viewWorldPosition: spaceshipCamera,
+  };
+
+  if(!spaceship){
     viewMatrixMain = m4.inverse(cameraPositionMain);
     sharedUniforms = {
       u_lightDirection: m4.normalize([-1, 3, 5]), // Vecchia luce
@@ -674,8 +710,8 @@ function render(time) {
       u_projection: projection,
       u_viewWorldPosition: spaceshipCamera,
     };
-  }
-  
+    
+  } 
 
   gl.useProgram(meshProgramInfo.program);
 
@@ -713,8 +749,8 @@ function render(time) {
   requestAnimationFrame(render);
 }
 
-loadModel("solar/solar.obj",50,[-50,-400,-1600],0.0001,[0,0,0],false,10);
-loadModel("planet1/Stylized_Planets.obj",300,[150,200,-5000],0.0001,[0,0,0],false,10);
-loadModel("spaceship/justigue league flying vehicle.obj",1,[0,-90,-400],0,[0,180,0],true,10);
-loadModel("system.obj",20,[-2000,1600,-1500],0.0001,[-90,0,0],false,10);
-loadModel("mirror/mirror.obj",50,[-5000,-900,-1000],0,[180,0,90],false,10);
+loadModel("solar/solar.obj",50,[-50,-400,-1600],0.0001,[0,0,0],false,10,false);
+loadModel("planet1/Stylized_Planets.obj",300,[150,200,-5000],0.0001,[0,0,0],false,10,false);
+loadModel("spaceship/justigue league flying vehicle.obj",1,[0,-90,-400],0,[0,180,0],true,10,false);
+loadModel("solsystem/system.obj",20,[-2000,1600,-1500],0.0001,[-90,0,0],false,10,false);
+loadModel("mirror/mirror.obj",50,[-5000,-900,-1000],0,[180,0,90],false,10,true);

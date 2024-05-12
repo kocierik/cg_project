@@ -4,21 +4,79 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="index.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
   </head>
-  <body>
-    <button id="fullscreenButton">FullScreen</button>
-    <button id="audioControl">Play Audio</button>
-    <button id="toggle-lights-button">Light</button>
-    <audio id="backgroundAudio" src="airplane.mp3" loop></audio>
-    <canvas id="canvas"></canvas>
-    <!--
-for most samples webgl-utils only provides shader compiling/linking and
-canvas resizing because why clutter the examples with code that's the same in every sample.
-See https://webglfundamentals.org/webgl/lessons/webgl-boilerplate.html
-and https://webglfundamentals.org/webgl/lessons/webgl-resizing-the-canvas.html
-for webgl-utils, m3, m4, and webgl-lessons-ui.
--->
+
+  <body class="bg-sky-950">
+    <div class="flex flex-1 flex-col">
+      <audio id="backgroundAudio" src="airplane.mp3" loop></audio>
+      <div
+        class="text-3xl flex flex-1 justify-center p-3 font-bold text-zinc-50 border-b-2"
+      >
+        Progetto Computer Graphics
+      </div>
+      <div class="flex flex-1 md:flex-row justify-center w-full flex-col">
+        <div style="flex: 1 0 75%" class="flex w-full">
+          <canvas id="canvas" class="flex flex-1 rounded-lg"></canvas>
+        </div>
+        <div
+          class="flex gap-1 justify-center flex-col p-5 border-l-2"
+          style="flex: 0 1 25%"
+        >
+          <button
+            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 rounded"
+            id="fullscreenButton"
+          >
+            FullScreen
+          </button>
+          <button
+            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 rounded"
+            id="audioControl"
+          >
+            Play Audio
+          </button>
+          <button
+            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 rounded"
+            id="toggle-lights-button"
+          >
+            Light On
+          </button>
+          <div id="directionalButtons" class="flex flex-col">
+            <div
+              class="arrow-key-container flex flex-row items-center justify-center"
+            >
+              <div class="arrow-key bg-sky-900" data-key="w">w</div>
+            </div>
+            <div class="arrow-key-container flex flex-row justify-center">
+              <div class="arrow-key bg-sky-900" data-key="a">a</div>
+              <div class="arrow-key bg-sky-900" data-key="s">s</div>
+              <div class="arrow-key bg-sky-900" data-key="d">d</div>
+            </div>
+            <!-- <div class="flex flex-1 flex-row">
+            <div class="arrow-key plus" data-key="187"></div>
+            <div class="arrow-key minus" data-key="189"></div>
+          </div> -->
+            <div class="flex flex-row justify-center">
+              <div class="arrow-key up bg-sky-700" data-key="ArrowUp"></div>
+              <div class="arrow-key down bg-sky-700" data-key="ArrowDown"></div>
+            </div>
+            <div class="flex flex-row justify-center">
+              <div class="arrow-key left bg-sky-700" data-key="ArrowLeft"></div>
+              <div
+                class="arrow-key right bg-sky-700"
+                data-key="ArrowRight"
+              ></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="flex flex-1 justify-center p-5 text-zinc-50 border-t-2">
+        Developed By Man - 2024
+      </div>
+    </div>
+
+    <!-- SHADERS BOX -->
     <script id="vertex-shader-3d" type="x-shader/x-vertex">
       attribute vec4 a_position;
       varying vec4 v_position;
@@ -28,13 +86,12 @@ for webgl-utils, m3, m4, and webgl-lessons-ui.
         gl_Position.z = 1.0;
       }
     </script>
-    <!-- fragment shader -->
     <script id="fragment-shader-3d" type="x-shader/x-fragment">
       precision mediump float;
-
+    
       uniform samplerCube u_skybox;
       uniform mat4 u_viewDirectionProjectionInverse;
-
+    
       varying vec4 v_position;
       void main() {
         vec4 t = u_viewDirectionProjectionInverse * v_position;
@@ -42,53 +99,17 @@ for webgl-utils, m3, m4, and webgl-lessons-ui.
       }
     </script>
 
-    <script src="https://webglfundamentals.org/webgl/resources/webgl-utils.js"></script>
-    <script src="https://webglfundamentals.org/webgl/resources/m4.js"></script>
-    <script src="https://webglfundamentals.org/webgl/resources/m3.js"></script>
-    <script src="index.js"></script>
-
-    <script src="index2.js"></script>
-
-    <!-- <script src="./js/utils/handlekey.js"></script>
-    <script src="js/utils/fullscreenAudio.js"></script> -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-
-    <script>
-      var audio = document.getElementById("backgroundAudio");
-      var audioControlButton = document.getElementById("audioControl");
-
-      audioControlButton.addEventListener("click", function () {
-        if (audio.paused) {
-          audio.play();
-          audioControlButton.textContent = "Pause Audio";
-        } else {
-          audio.pause();
-          audioControlButton.textContent = "Play Audio";
-        }
-      });
-    </script>
-
-    <script>
-      var fullscreenButton = document.getElementById("fullscreenButton");
-
-      // Aggiungi un listener per il click sul bottone
-      fullscreenButton.addEventListener("click", function () {
-        var canvas = document.getElementById("canvas");
-
-        // Controlla se il browser supporta la modalità fullscreen
-        if (document.fullscreenEnabled) {
-          // Richiedi la modalità fullscreen per il canvas
-          canvas.requestFullscreen();
-        } else {
-          alert("Fullscreen non supportato dal browser.");
-        }
-      });
-
-      const toggleLightsButton = document.querySelector("#toggle-lights-button");
-      toggleLightsButton.addEventListener("click", () => {
-        lightsEnabled = !lightsEnabled; // Cambia lo stato delle luci
-      });
-
-    </script>
+        <!-- WEBGL LIB -->
+        <script src="https://webglfundamentals.org/webgl/resources/webgl-utils.js"></script>
+        <script src="https://webglfundamentals.org/webgl/resources/m4.js"></script>
+        <script src="https://webglfundamentals.org/webgl/resources/m3.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    
+        <!-- EXTERNAL CODE JS -->
+        <script src="index.js"></script>
+        <script src="index2.js"></script>
+        <script src="utils/audio.js"></script>
+        <script src="utils/fullscreen.js"></script>
+        <script src="utils/light.js"></script>
   </body>
 </html>
