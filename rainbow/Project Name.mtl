@@ -1,0 +1,28 @@
+newmtl Clementine 1_d0c7f566-08ec-4dd6-9a6c-e326e7cd3b43
+Kd 1.000 1.000 1.000
+d 1.000
+map_Kd sfcdp3_colorblock_alb.jpg
+newmtl Clementine_c37562a2-828c-4141-90f1-c1124a95d49e
+Kd 1.000 1.000 1.000
+d 1.000
+map_Kd sfcdp3_colorblock_alb.jpg
+newmtl Nila 2_0bced33e-e2af-4065-8682-4b215cfc1d35
+Kd 1.000 1.000 1.000
+d 1.000
+map_Kd dsfc_jumpcomb_alb.jpg
+newmtl Nila 1_5d71cc90-c539-4fb5-bfac-fbe9409de5d4
+Kd 1.000 1.000 1.000
+d 1.000
+map_Kd dsfc_r_tairu_alb.jpg
+newmtl M_CheckGate3dsrr_Gold_56a3062f-bd84-4f58-ad77-dc4eef4ec9c2
+Kd 0.773 0.533 0.118
+d 1.000
+newmtl M_CheckGate3dsrr_2dc66ad7-d340-4e15-b1c0-c31abfd83c80
+Kd 1.000 1.000 1.000
+d 1.000
+map_Kd T_CheckGate3dsrr_Alb.jpg
+newmtl M_StarRing_dc5fcad2-0ff4-4d87-bf98-2a3bea11071a
+Kd 1.000 1.000 1.000
+d 1.000
+map_Kd T_StarRing_Alb&T_StarRing_Msk.png
+

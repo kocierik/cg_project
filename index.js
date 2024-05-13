@@ -577,10 +577,8 @@ window.addEventListener('keyup', handleKeyUp);
 
 function handleKeyDown(event) {
   const key = event.key.toLowerCase();
-  if (keys.hasOwnProperty(key)) {
     keys[key] = true;
     updateCameraPosition();
-  }
 }
 
 function handleKeyUp(event) {
@@ -611,7 +609,7 @@ document.querySelectorAll(".arrow-key").forEach(function(button) {
 
 // Funzione per aggiornare la posizione della camera in base ai tasti premuti
 function updateCameraPosition() {
-  const velocity = 10; // Velocità del movimento
+  const velocity = 7; // Velocità del movimento
   if (keys['w']) {
     m4.translate(cameraPositionMain, 0, 0, -velocity, cameraPositionMain);
   }
@@ -631,10 +629,10 @@ function updateCameraPosition() {
     m4.translate(cameraPositionMain, 0, -velocity, 0, cameraPositionMain);
   }
   if (keys['ArrowLeft']) {
-    m4.yRotate(cameraPositionMain, degToRad(1), cameraPositionMain);
+    m4.yRotate(cameraPositionMain, degToRad(0.5), cameraPositionMain);
   }
   if (keys['ArrowRight']) {
-    m4.yRotate(cameraPositionMain, degToRad(-1), cameraPositionMain);
+    m4.yRotate(cameraPositionMain, degToRad(-0.5), cameraPositionMain);
   }
   if (keys['arrowup']) {
     m4.translate(cameraPositionMain, 0, velocity, 0, cameraPositionMain);
@@ -643,10 +641,10 @@ function updateCameraPosition() {
     m4.translate(cameraPositionMain, 0, -velocity, 0, cameraPositionMain);
   }
   if (keys['arrowleft']) {
-    m4.yRotate(cameraPositionMain, degToRad(1), cameraPositionMain);
+    m4.yRotate(cameraPositionMain, degToRad(0.5), cameraPositionMain);
   }
   if (keys['arrowright']) {
-    m4.yRotate(cameraPositionMain, degToRad(-1), cameraPositionMain);
+    m4.yRotate(cameraPositionMain, degToRad(-0.5), cameraPositionMain);
   }
 }
 
@@ -749,8 +747,28 @@ function render(time) {
   requestAnimationFrame(render);
 }
 
-loadModel("solar/solar.obj",50,[-50,-400,-1600],0.0001,[0,0,0],false,10,false);
-loadModel("planet1/Stylized_Planets.obj",300,[150,200,-5000],0.0001,[0,0,0],false,10,false);
+
+loadModel("solar/solar.obj",40,[1000,-200,-1500],0.0001,[0,0,0],false,10,false);
+// loadModel("planet1/Stylized_Planets.obj",300,[2000,0,4500],0.0001,[0,0,0],false,10,false);
 loadModel("spaceship/justigue league flying vehicle.obj",1,[0,-90,-400],0,[0,180,0],true,10,false);
-loadModel("solsystem/system.obj",20,[-2000,1600,-1500],0.0001,[-90,0,0],false,10,false);
-loadModel("mirror/mirror.obj",50,[-5000,-900,-1000],0,[180,0,90],false,10,true);
+loadModel("solsystem/system.obj",20,[4000,1600,5000],0.0001,[-90,0,0],false,10,false);
+loadModel("rainbow/untitled.obj",100,[-30,0,-100],0,[180,210,180],false,10,true);
+// loadModel("mirror/mirror.obj",50,[-5000,-900,-1000],0,[180,0,90],false,10,true);
+
+// document.addEventListener("DOMContentLoaded", function() {
+//   var loadingText = document.getElementById("loadingText");
+//   var canvas = document.getElementById("canvas");
+
+//   function hideLoadingText() {
+//     loadingText.style.display = "none";
+//     canvas.style.display = "block";
+//   }
+
+//   loadModel("solar/solar.obj",40,[1000,-200,-1500],0.0001,[0,0,0],false,10,false);
+//   // loadModel("planet1/Stylized_Planets.obj",300,[2000,0,4500],0.0001,[0,0,0],false,10,false);
+//   loadModel("spaceship/justigue league flying vehicle.obj",1,[0,-90,-400],0,[0,180,0],true,10,false);
+//   loadModel("solsystem/system.obj",20,[4000,1600,5000],0.0001,[-90,0,0],false,10,false);
+//   loadModel("rainbow/untitled.obj",100,[-30,0,-100],0,[180,210,180],false,10,true);
+//   // loadModel("mirror/mirror.obj",50,[-5000,-900,-1000],0,[180,0,90],false,10,true);
+//   setTimeout(hideLoadingText, 3000);
+// });

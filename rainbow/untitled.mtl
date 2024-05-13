@@ -1,0 +1,52 @@
+# Blender 4.1.1 MTL File: 'None'
+# www.blender.org
+
+newmtl M_CheckGate3dsrr_2dc66ad7-d340-4e15-b1c0-c31abfd83c80
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd T_CheckGate3dsrr_Alb.jpg
+
+newmtl M_CheckGate3dsrr_Gold_56a3062f-bd84-4f58-ad77-dc4eef4ec9c2
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.773000 0.533000 0.118000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+
+newmtl M_StarRing_dc5fcad2-0ff4-4d87-bf98-2a3bea11071a
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd T_StarRing_Alb&T_StarRing_Msk.png
+
+newmtl Nila_1_5d71cc90-c539-4fb5-bfac-fbe9409de5d4
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd dsfc_r_tairu_alb.jpg
+
+newmtl Nila_2_0bced33e-e2af-4065-8682-4b215cfc1d35
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd dsfc_jumpcomb_alb.jpg

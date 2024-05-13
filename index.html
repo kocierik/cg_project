@@ -3,12 +3,25 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>Progetto Computer Graphics</title>
     <link rel="stylesheet" href="index.css" />
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      /* Aggiungi stili CSS per centrare l'elemento */
+      #loadingText {
+        display: flex;
+        flex: 1 0 auto;
+        justify-content: center;
+        align-items: center;
+        font-size: 24px;
+        color: white;
+        z-index: 9999; /* Assicura che il testo sia sopra tutti gli altri elementi */
+      }
+    </style>
   </head>
 
   <body class="bg-sky-950">
+
     <div class="flex flex-1 flex-col">
       <audio id="backgroundAudio" src="airplane.mp3" loop></audio>
       <div
@@ -17,9 +30,13 @@
         Progetto Computer Graphics
       </div>
       <div class="flex flex-1 md:flex-row justify-center w-full flex-col">
-        <div style="flex: 1 0 75%" class="flex w-full">
-          <canvas id="canvas" class="flex flex-1 rounded-lg"></canvas>
-        </div>
+    <div style="flex: 1 0 75%" class="flex w-full">
+      <!-- <div id="loadingText" class="text-3xl flex flex-1 justify-center p-3 font-bold text-zinc-50 border-b-2">
+        Caricamento...
+      </div>  style="display: none;" -->
+      <canvas id="canvas" id="canvasContainer"   class="flex flex-1 rounded-lg">
+      </canvas>
+    </div>
         <div
           class="flex gap-1 justify-center flex-col p-5 border-l-2"
           style="flex: 0 1 25%"
