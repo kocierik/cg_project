@@ -607,6 +607,7 @@ document.querySelectorAll(".arrow-key").forEach(function(button) {
   });
 });
 
+
 // Funzione per aggiornare la posizione della camera in base ai tasti premuti
 function updateCameraPosition() {
   const velocity = 7; // Velocità del movimento
@@ -748,11 +749,11 @@ function render(time) {
 }
 
 
-loadModel("solar/solar.obj",40,[1000,-200,-1500],0.0001,[0,0,0],false,10,false);
+loadModel("solar/solar.obj",40,[1000,500,-1500],0.0001,[0,0,0],false,10,false);
 // loadModel("planet1/Stylized_Planets.obj",300,[2000,0,4500],0.0001,[0,0,0],false,10,false);
 loadModel("spaceship/justigue league flying vehicle.obj",1,[0,-90,-400],0,[0,180,0],true,10,false);
 loadModel("solsystem/system.obj",20,[4000,1600,5000],0.0001,[-90,0,0],false,10,false);
-loadModel("rainbow/untitled.obj",100,[-30,0,-100],0,[180,210,180],false,10,true);
+loadModel("rainbow/rainbow.obj",100,[0,350,-180],0,[180,230,170],false,10,true);
 // loadModel("mirror/mirror.obj",50,[-5000,-900,-1000],0,[180,0,90],false,10,true);
 
 // document.addEventListener("DOMContentLoaded", function() {
