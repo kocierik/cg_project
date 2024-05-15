@@ -27,7 +27,7 @@
       <div
         class="text-3xl flex flex-1 justify-center p-3 font-bold text-zinc-50 border-b-2"
       >
-        Progetto Computer Graphics
+        Computer Graphics
       </div>
       <div class="flex flex-1 md:flex-row justify-center w-full flex-col">
     <div style="flex: 1 0 75%" class="flex w-full">
@@ -59,21 +59,80 @@
           >
             Light On
           </button>
+          <div class="w-full">
+            <div class="flex mt-2 flex-1 justify-center">
+              <span class="text-zinc-50">fov: <span id="fovText" class="text-zinc-50"> 60</span></span>
+            </div>
+            <input
+              type="range"
+              min="30"
+              max="100"
+              step="1"
+              value="60"
+              class="slider appearance-none w-full h-2 bg-sky-800 rounded-full mt-2"
+              id="mySlider"
+            >
+          </div>
+
+          <!-- first light -->
+          <div class="w-full">
+            <div class="flex mt-2 flex-1 justify-center">
+              <span class="text-zinc-50">light x: <span id="lightxText" class="text-zinc-50">60</span></span>
+            </div>
+            <input
+              type="range"
+              min="30"
+              max="1000"
+              step="1"
+              value="60"
+              class="slider appearance-none w-full h-2 bg-sky-800 rounded-full mt-2"
+              id="lightx"
+            >
+          </div>
+
+          <div class="w-full">
+            <div class="flex mt-2 flex-1 justify-center">
+              <span class="text-zinc-50">light y: <span id="lightyText" class="text-zinc-50">60</span></span>
+            </div>
+            <input
+              type="range"
+              min="30"
+              max="1000"
+              step="1"
+              value="60"
+              class="slider appearance-none w-full h-2 bg-sky-800 rounded-full mt-2"
+              id="lighty"
+            >
+          </div>
+
+          <div class="w-full">
+            <div class="flex mt-2 flex-1 justify-center">
+              <span class="text-zinc-50">light z: <span id="lightzText" class="text-zinc-50">60</span></span>
+            </div>
+            <input
+              type="range"
+              min="30"
+              max="1000"
+              step="1"
+              value="60"
+              class="slider appearance-none w-full h-2 bg-sky-800 rounded-full mt-2"
+              id="lightz"
+            >
+          </div>
+          
           <div id="directionalButtons" class="flex flex-col">
             <div
               class="arrow-key-container flex flex-row items-center justify-center"
             >
+            <div class="arrow-key plus" data-key="plus"></div>
               <div class="arrow-key bg-sky-900" data-key="w">w</div>
+              <div class="arrow-key minus" data-key="minus"></div>
             </div>
             <div class="arrow-key-container flex flex-row justify-center">
               <div class="arrow-key bg-sky-900" data-key="a">a</div>
               <div class="arrow-key bg-sky-900" data-key="s">s</div>
               <div class="arrow-key bg-sky-900" data-key="d">d</div>
             </div>
-            <!-- <div class="flex flex-1 flex-row">
-            <div class="arrow-key plus" data-key="187"></div>
-            <div class="arrow-key minus" data-key="189"></div>
-          </div> -->
             <div class="flex flex-row justify-center">
               <div class="arrow-key up bg-sky-700" data-key="ArrowUp"></div>
               <div class="arrow-key down bg-sky-700" data-key="ArrowDown"></div>
@@ -128,5 +187,61 @@
         <script src="utils/audio.js"></script>
         <script src="utils/fullscreen.js"></script>
         <script src="utils/light.js"></script>
+        <script>
+          window.addEventListener('DOMContentLoaded', () => {
+            const slider = document.getElementById('mySlider');
+            const fovText = document.getElementById('fovText'); 
+        
+            slider.addEventListener('input', function() {
+              const fovValue = parseInt(this.value);
+              fov = fovValue;
+              fovText.textContent = fovValue;
+              updateFov(fov);
+            });
+          });
+        </script>
+
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    const slider = document.getElementById('lightx');
+    const fovText = document.getElementById('lightxText'); 
+
+    slider.addEventListener('input', function() {
+      const fovValue = parseInt(this.value);
+      lightx = fovValue;
+      fovText.textContent = fovValue;
+      updateFov(fov);
+    });
+  });
+</script>
+
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    const slider = document.getElementById('lighty');
+    const fovText = document.getElementById('lightyText');
+
+    slider.addEventListener('input', function() {
+      const fovValue = parseInt(this.value);
+      lighty = fovValue;
+      fovText.textContent = fovValue;
+      updateFov(fov);
+    });
+  });
+</script>
+
+<script>
+  window.addEventListener('DOMContentLoaded', () =>  {
+    const slider = document.getElementById('lightz');
+    const fovText = document.getElementById('lightzText'); 
+
+    slider.addEventListener('input', function() {
+      const fovValue = parseInt(this.value);
+      lightz = fovValue;
+      fovText.textContent = fovValue;
+      updateFov(fov);
+    });
+  });
+</script>
+        
   </body>
 </html>

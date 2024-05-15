@@ -4,10 +4,15 @@
 // see http://paulbourke.net/dataformats/obj/
 
 var cameraPositionMain = m4.identity()
-cameraPositionMain = m4.translation(0, 0, 0);
+// cameraPositionMain = m4.translation(10, 10, 10);
 let viewMatrixMain;
 let lightsEnabled = true;
+let fov = 60
 
+let lightx = 1
+let lighty = 1
+let lightz = 1
+let velocity = 10
 var spaceshipCamera = m4.identity()
 
 function parseOBJ(text) {
@@ -568,7 +573,9 @@ const keys = {
   ArrowUp: false,
   ArrowDown: false,
   ArrowLeft: false,
-  ArrowRight: false
+  ArrowRight: false,
+  plus: false,
+  minus: false
 };
 
 // Event listeners per i tasti
@@ -610,7 +617,6 @@ document.querySelectorAll(".arrow-key").forEach(function(button) {
 
 // Funzione per aggiornare la posizione della camera in base ai tasti premuti
 function updateCameraPosition() {
-  const velocity = 7; // Velocità del movimento
   if (keys['w']) {
     m4.translate(cameraPositionMain, 0, 0, -velocity, cameraPositionMain);
   }
@@ -646,6 +652,12 @@ function updateCameraPosition() {
   }
   if (keys['arrowright']) {
     m4.yRotate(cameraPositionMain, degToRad(-0.5), cameraPositionMain);
+  }
+  if (keys['plus']) {
+    velocity +=1
+  }
+  if (keys['minus']) {
+    velocity--
   }
 }
 
@@ -683,7 +695,7 @@ function render(time) {
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
   gl.enable(gl.DEPTH_TEST);
   
-  const fieldOfViewRadians = degToRad(60);
+  const fieldOfViewRadians = degToRad(fov);
   const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
   const projection = m4.perspective(fieldOfViewRadians, aspect, zNear, zFar);
   
@@ -702,8 +714,9 @@ function render(time) {
   if(!spaceship){
     viewMatrixMain = m4.inverse(cameraPositionMain);
     sharedUniforms = {
-      u_lightDirection: m4.normalize([-1, 3, 5]), // Vecchia luce
-      u_frontLightDirection: m4.normalize([0, 0, -1]), // Nuova luce frontale
+      // u_lightDirection: m4.normalize([-1, 3, 5]), // Vecchia luce
+      u_lightDirection: m4.normalize([lightx, lighty, -lightz]), // Vecchia luce
+      u_frontLightDirection: m4.normalize([10, 50, -1]), // Nuova luce frontale
       u_lightsEnabled: lightsEnabled ? 1 : 0,
       u_view: viewMatrixMain,
       u_projection: projection,
@@ -751,7 +764,7 @@ function render(time) {
 
 loadModel("solar/solar.obj",40,[1000,500,-1500],0.0001,[0,0,0],false,10,false);
 // loadModel("planet1/Stylized_Planets.obj",300,[2000,0,4500],0.0001,[0,0,0],false,10,false);
-loadModel("spaceship/justigue league flying vehicle.obj",1,[0,-90,-400],0,[0,180,0],true,10,false);
+loadModel("spaceship/justigue league flying vehicle.obj",1,[0,-90,-400],0,[0,180,0],true,velocity,false);
 loadModel("solsystem/system.obj",20,[4000,1600,5000],0.0001,[-90,0,0],false,10,false);
 loadModel("rainbow/rainbow.obj",100,[0,350,-180],0,[180,230,170],false,10,true);
 // loadModel("mirror/mirror.obj",50,[-5000,-900,-1000],0,[180,0,90],false,10,true);
