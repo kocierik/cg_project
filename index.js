@@ -14,6 +14,7 @@ let lighty = 1
 let lightz = 1
 let velocity = 10
 var spaceshipCamera = m4.identity()
+let initialSpaceshipRotation = 0
 
 function parseOBJ(text) {
   // because indices are base 1 let's just fill in the 0th data
@@ -615,6 +616,7 @@ document.querySelectorAll(".arrow-key").forEach(function(button) {
 });
 
 
+
 // Funzione per aggiornare la posizione della camera in base ai tasti premuti
 function updateCameraPosition() {
   if (keys['w']) {
@@ -628,6 +630,7 @@ function updateCameraPosition() {
   }
   if (keys['d']) {
     m4.translate(cameraPositionMain, velocity, 0, 0, cameraPositionMain);
+    // cameraPositionMain = m4.translation(10, 10, 10);
   }
   if (keys['ArrowUp']) {
     m4.translate(cameraPositionMain, 0, velocity, 0, cameraPositionMain);
@@ -637,9 +640,13 @@ function updateCameraPosition() {
   }
   if (keys['ArrowLeft']) {
     m4.yRotate(cameraPositionMain, degToRad(0.5), cameraPositionMain);
+    m4.zRotate(spaceshipCamera, degToRad(-0.1), spaceshipCamera);
+    initialSpaceshipRotation -= 0.1
   }
   if (keys['ArrowRight']) {
     m4.yRotate(cameraPositionMain, degToRad(-0.5), cameraPositionMain);
+    m4.zRotate(spaceshipCamera, degToRad(0.1), spaceshipCamera);
+    initialSpaceshipRotation += 0.1
   }
   if (keys['arrowup']) {
     m4.translate(cameraPositionMain, 0, velocity, 0, cameraPositionMain);
@@ -649,9 +656,13 @@ function updateCameraPosition() {
   }
   if (keys['arrowleft']) {
     m4.yRotate(cameraPositionMain, degToRad(0.5), cameraPositionMain);
+    m4.zRotate(spaceshipCamera, degToRad(-0.1), spaceshipCamera);
+    initialSpaceshipRotation -= 0.1
   }
   if (keys['arrowright']) {
     m4.yRotate(cameraPositionMain, degToRad(-0.5), cameraPositionMain);
+    m4.zRotate(spaceshipCamera, degToRad(0.1), spaceshipCamera);
+    initialSpaceshipRotation += 0.1
   }
   if (keys['plus']) {
     velocity +=1
@@ -710,6 +721,14 @@ function render(time) {
     u_projection: projection,
     u_viewWorldPosition: spaceshipCamera,
   };
+  
+  if(initialSpaceshipRotation > 0){
+      m4.zRotate(spaceshipCamera, degToRad(-0.1), spaceshipCamera);
+      initialSpaceshipRotation -= 0.1
+  } else if(initialSpaceshipRotation < 0) {
+    m4.zRotate(spaceshipCamera, degToRad(0.1), spaceshipCamera);
+    initialSpaceshipRotation += 0.1
+  }
 
   if(!spaceship){
     viewMatrixMain = m4.inverse(cameraPositionMain);
