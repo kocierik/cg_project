@@ -183,65 +183,10 @@
     
         <!-- EXTERNAL CODE JS -->
         <script src="index.js"></script>
-        <script src="index2.js"></script>
+        <script src="skybox.js"></script>
         <script src="utils/audio.js"></script>
         <script src="utils/fullscreen.js"></script>
         <script src="utils/light.js"></script>
-        <script>
-          window.addEventListener('DOMContentLoaded', () => {
-            const slider = document.getElementById('mySlider');
-            const fovText = document.getElementById('fovText'); 
-        
-            slider.addEventListener('input', function() {
-              const fovValue = parseInt(this.value);
-              fov = fovValue;
-              fovText.textContent = fovValue;
-              updateFov(fov);
-            });
-          });
-        </script>
-
-<script>
-  window.addEventListener('DOMContentLoaded', () => {
-    const slider = document.getElementById('lightx');
-    const fovText = document.getElementById('lightxText'); 
-
-    slider.addEventListener('input', function() {
-      const fovValue = parseInt(this.value);
-      lightx = fovValue;
-      fovText.textContent = fovValue;
-      updateFov(fov);
-    });
-  });
-</script>
-
-<script>
-  window.addEventListener('DOMContentLoaded', () => {
-    const slider = document.getElementById('lighty');
-    const fovText = document.getElementById('lightyText');
-
-    slider.addEventListener('input', function() {
-      const fovValue = parseInt(this.value);
-      lighty = fovValue;
-      fovText.textContent = fovValue;
-      updateFov(fov);
-    });
-  });
-</script>
-
-<script>
-  window.addEventListener('DOMContentLoaded', () =>  {
-    const slider = document.getElementById('lightz');
-    const fovText = document.getElementById('lightzText'); 
-
-    slider.addEventListener('input', function() {
-      const fovValue = parseInt(this.value);
-      lightz = fovValue;
-      fovText.textContent = fovValue;
-      updateFov(fov);
-    });
-  });
-</script>
-        
+        <script src="utils/handleButton.js"></script>
   </body>
 </html>

@@ -762,11 +762,11 @@ function render(time) {
 }
 
 
-loadModel("solar/solar.obj",40,[1000,500,-1500],0.0001,[0,0,0],false,10,false);
+loadModel("assets/solar/solar.obj",40,[1000,500,-1500],0.0001,[0,0,0],false,10,false);
 // loadModel("planet1/Stylized_Planets.obj",300,[2000,0,4500],0.0001,[0,0,0],false,10,false);
-loadModel("spaceship/justigue league flying vehicle.obj",1,[0,-90,-400],0,[0,180,0],true,velocity,false);
-loadModel("solsystem/system.obj",20,[4000,1600,5000],0.0001,[-90,0,0],false,10,false);
-loadModel("rainbow/rainbow.obj",100,[0,350,-180],0,[180,230,170],false,10,true);
+loadModel("assets/spaceship/justigue league flying vehicle.obj",1,[0,-90,-400],0,[0,180,0],true,velocity,false);
+loadModel("assets/solsystem/system.obj",20,[4000,1600,5000],0.0001,[-90,0,0],false,10,false);
+loadModel("assets/rainbow/rainbow.obj",100,[0,350,-180],0,[180,230,170],false,10,true);
 // loadModel("mirror/mirror.obj",50,[-5000,-900,-1000],0,[180,0,90],false,10,true);
 
 // document.addEventListener("DOMContentLoaded", function() {

@@ -37,27 +37,27 @@ function main() {
 const faceInfos = [
     {
       target: gl.TEXTURE_CUBE_MAP_POSITIVE_X,
-      url: 'skybox/skybox1/1.png',
+      url: 'assets/skybox/skybox1/1.png',
     },
     {
       target: gl.TEXTURE_CUBE_MAP_NEGATIVE_X,
-      url: 'skybox/skybox1/3.png',
+      url: 'assets/skybox/skybox1/3.png',
     },
     {
       target: gl.TEXTURE_CUBE_MAP_POSITIVE_Y,
-      url: 'skybox/skybox1/5.png',
+      url: 'assets/skybox/skybox1/5.png',
     },
     {
       target: gl.TEXTURE_CUBE_MAP_NEGATIVE_Y,
-      url: 'skybox/skybox1/6.png',
+      url: 'assets/skybox/skybox1/6.png',
     },
     {
       target: gl.TEXTURE_CUBE_MAP_POSITIVE_Z,
-      url: 'skybox/skybox1/2.png',
+      url: 'assets/skybox/skybox1/2.png',
     },
     {
       target: gl.TEXTURE_CUBE_MAP_NEGATIVE_Z,
-      url: 'skybox/skybox1/4.png',
+      url: 'assets/skybox/skybox1/4.png',
     },
   ];
 
