@@ -716,15 +716,28 @@ function render(time) {
   
   // const up = [0, 1, 0];
   var sharedUniforms
-  // Compute the camera's matrix using look at.
-  viewMatrixMain = m4.inverse(spaceshipCamera);
+  viewMatrixMain = m4.inverse(cameraPositionMain);
   sharedUniforms = {
-    u_lightDirection: m4.normalize([-1, 3, 5]),
-    u_lightsEnabled: lightsEnabled ? 1 : 0, 
+    // u_lightDirection: m4.normalize([-1, 3, 5]), // Vecchia luce
+    u_lightDirection: m4.normalize([lightx, lighty, -lightz]), // Vecchia luce
+    u_frontLightDirection: m4.normalize([10, 50, -1]), // Nuova luce frontale
+    u_lightsEnabled: lightsEnabled ? 1 : 0,
     u_view: viewMatrixMain,
     u_projection: projection,
     u_viewWorldPosition: spaceshipCamera,
-  };
+  }; 
+
+  if(spaceship){
+    viewMatrixMain = m4.inverse(spaceshipCamera);
+    sharedUniforms = {
+      u_lightDirection: m4.normalize([-1, 3, 5]),
+      u_lightsEnabled: lightsEnabled ? 1 : 0, 
+      u_view: viewMatrixMain,
+      u_projection: projection,
+      u_viewWorldPosition: spaceshipCamera,
+    };
+  } 
+
   
   if(initialSpaceshipRotation > 0){
       m4.zRotate(spaceshipCamera, degToRad(-0.1), spaceshipCamera);
@@ -734,19 +747,6 @@ function render(time) {
     initialSpaceshipRotation += 0.1
   }
 
-  if(!spaceship){
-    viewMatrixMain = m4.inverse(cameraPositionMain);
-    sharedUniforms = {
-      // u_lightDirection: m4.normalize([-1, 3, 5]), // Vecchia luce
-      u_lightDirection: m4.normalize([lightx, lighty, -lightz]), // Vecchia luce
-      u_frontLightDirection: m4.normalize([10, 50, -1]), // Nuova luce frontale
-      u_lightsEnabled: lightsEnabled ? 1 : 0,
-      u_view: viewMatrixMain,
-      u_projection: projection,
-      u_viewWorldPosition: spaceshipCamera,
-    };
-    
-  } 
 
   gl.useProgram(meshProgramInfo.program);
 
