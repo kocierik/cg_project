@@ -11,3 +11,16 @@ const toggleLightsButton = document.querySelector(
       ? "Light: On"
       : "Light: Off";
   });
+
+
+const toggleShadowsButton = document.querySelector(
+  "#toggle-shadows-button"
+);
+
+toggleShadowsButton.addEventListener("click", () => {
+  shadowsEnabled = !shadowsEnabled; // Cambia lo stato delle luci
+
+  toggleShadowsButton.textContent = shadowsEnabled
+    ? "Shadows: On"
+    : "Shadows: Off";
+});

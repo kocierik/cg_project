@@ -3,8 +3,9 @@
 var cameraPositionMain = m4.identity()
 let viewMatrixMain;
 let lightsEnabled = true;
+let shadowsEnabled = true
 let fov = 60
-
+let gl
 let lightx = 1
 let lighty = 1
 let lightz = 1
@@ -325,7 +326,7 @@ async function loadModel(objHref, resizeObj,positionObj,rotation,rotatePosition,
   // Get A WebGL context
   /** @type {HTMLCanvasElement} */
   const canvas = document.querySelector("#canvas");
-  const gl = canvas.getContext("webgl");
+   gl = canvas.getContext("webgl");
   if (!gl) {
     return;
   }
@@ -704,7 +705,7 @@ function rotateObject(rotatePosition, u_world) {
 
 function render(time) {
   time *= rotation;  // convert to seconds
-
+  
   webglUtils.resizeCanvasToDisplaySize(gl.canvas);
   gl.clearColor(0, 0, 0, 1);
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);

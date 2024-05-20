@@ -1,6 +1,6 @@
 html,
 body {
-  height: 100vh;
+  height: 100%;
   width: 100%;
 }
 
@@ -69,12 +69,12 @@ label {
   display: inline-flex;
   font-size: 30px;
   font-weight: bold;
-  height: 55px;
+  height: 45px;
   justify-content: center;
   margin: 5px;
   transform: translate3d(0, 0, 0);
   transition: box-shadow 0.1s linear, transform 0.1s linear;
-  width: 75px;
+  width: 65px;
 }
 
 .arrow-key:active,

@@ -1,159 +1,123 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Progetto Computer Graphics</title>
-    <link rel="stylesheet" href="index.css" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-      /* Aggiungi stili CSS per centrare l'elemento */
-      #loadingText {
-        display: flex;
-        flex: 1 0 auto;
-        justify-content: center;
-        align-items: center;
-        font-size: 24px;
-        color: white;
-        z-index: 9999; /* Assicura che il testo sia sopra tutti gli altri elementi */
-      }
-    </style>
-  </head>
 
-  <body class="bg-sky-950">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Progetto Computer Graphics</title>
+  <link rel="stylesheet" href="index.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Aggiungi stili CSS per centrare l'elemento */
+    #loadingText {
+      display: flex;
+      flex: 1 0 auto;
+      justify-content: center;
+      align-items: center;
+      font-size: 24px;
+      color: white;
+      z-index: 9999;
+      /* Assicura che il testo sia sopra tutti gli altri elementi */
+    }
+  </style>
+</head>
 
-    <div class="flex flex-1 flex-col">
-      <audio id="backgroundAudio" src="marioKart.mp3" loop></audio>
-      <div
-        class="text-3xl flex flex-1 justify-center p-3 font-bold text-zinc-50 border-b-2"
-      >
-        Computer Graphics
-      </div>
-      <div class="flex flex-1 md:flex-row justify-center w-full flex-col">
-    <div style="flex: 1 0 75%" class="flex w-full">
-      <!-- <div id="loadingText" class="text-3xl flex flex-1 justify-center p-3 font-bold text-zinc-50 border-b-2">
+<body class="bg-sky-950">
+
+  <div class="flex flex-1 flex-col">
+    <audio id="backgroundAudio" src="marioKart.mp3" loop></audio>
+    <div class="text-3xl flex flex-1 justify-center p-3 font-bold text-zinc-50 border-b-2">
+      Computer Graphics
+    </div>
+    <div class="flex flex-1 md:flex-row justify-center  flex-col">
+      <div style="flex: 1 0 75%" class="flex h-4/6 flex-col">
+        <!-- <div id="loadingText" class="text-3xl flex flex-1 justify-center p-3 font-bold text-zinc-50 border-b-2">
         Caricamento...
       </div>  style="display: none;" -->
-      <canvas id="canvas" id="canvasContainer"   class="flex flex-1 rounded-lg">
-      </canvas>
-    </div>
-        <div
-          class="flex gap-1 justify-center flex-col p-5 border-l-2"
-          style="flex: 0 1 25%"
-        >
-          <button
-            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 rounded"
-            id="fullscreenButton"
-          >
-            FullScreen
-          </button>
-          <button
-            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 rounded"
-            id="audioControl"
-          >
-            Play Audio
-          </button>
-          <button
-            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 rounded"
-            id="toggle-lights-button"
-          >
-            Light On
-          </button>
-          <div class="w-full">
-            <div class="flex mt-2 flex-1 justify-center">
-              <span class="text-zinc-50">fov: <span id="fovText" class="text-zinc-50"> 60</span></span>
-            </div>
-            <input
-              type="range"
-              min="30"
-              max="100"
-              step="1"
-              value="60"
-              class="slider appearance-none w-full h-2 bg-sky-800 rounded-full mt-2"
-              id="mySlider"
-            >
-          </div>
+        <canvas id="canvas" id="canvasContainer" class=" w-full h-4/6 rounded-lg">
+        </canvas>
+        <div class="flex justify-center gap-5 p-2">
+        <button class="bg-blue-500 w-1/4 hover:bg-blue-700 text-white font-bold py-2 rounded" id="fullscreenButton">
+          FullScreen
+        </button>
+        <button class="bg-blue-500 w-1/4 hover:bg-blue-700 text-white font-bold py-2 rounded" id="audioControl">
+          Play Audio
+        </button>
+        <button class="bg-blue-500 w-1/4 hover:bg-blue-700 text-white font-bold py-2 rounded" id="toggle-lights-button">
+          Light On
+        </button>
 
-          <!-- first light -->
-          <div class="w-full">
-            <div class="flex mt-2 flex-1 justify-center">
-              <span class="text-zinc-50">light x: <span id="lightxText" class="text-zinc-50">60</span></span>
-            </div>
-            <input
-              type="range"
-              min="30"
-              max="1000"
-              step="1"
-              value="60"
-              class="slider appearance-none w-full h-2 bg-sky-800 rounded-full mt-2"
-              id="lightx"
-            >
+        <button class="bg-blue-500 w-1/4 hover:bg-blue-700 text-white font-bold py-2 rounded" id="toggle-shadows-button">
+          Shadow On
+        </button>
+      </div>
+      </div>
+      <div class="flex gap-2 justify-center flex-col p-5  border-l-2" style="flex: 0 1 25%">
+        <div class="flex flex-1 justify-center text-white text-2xl font-bold">
+          Settings
+        </div> 
+        <div class="w-full">
+          <div class="flex mt-2 flex-1 justify-center">
+            <span class="text-zinc-50">fov: <span id="fovText" class="text-zinc-50"> 60</span></span>
           </div>
+          <input type="range" min="30" max="100" step="1" value="60"
+            class="slider appearance-none w-full h-2 bg-sky-800 rounded-full mt-2" id="mySlider">
+        </div>
 
-          <div class="w-full">
-            <div class="flex mt-2 flex-1 justify-center">
-              <span class="text-zinc-50">light y: <span id="lightyText" class="text-zinc-50">60</span></span>
-            </div>
-            <input
-              type="range"
-              min="30"
-              max="1000"
-              step="1"
-              value="60"
-              class="slider appearance-none w-full h-2 bg-sky-800 rounded-full mt-2"
-              id="lighty"
-            >
+        <!-- first light -->
+        <div class="w-full">
+          <div class="flex mt-2 flex-1 justify-center">
+            <span class="text-zinc-50">light x: <span id="lightxText" class="text-zinc-50">60</span></span>
           </div>
+          <input type="range" min="30" max="1000" step="1" value="60"
+            class="slider appearance-none w-full h-2 bg-sky-800 rounded-full mt-2" id="lightx">
+        </div>
 
-          <div class="w-full">
-            <div class="flex mt-2 flex-1 justify-center">
-              <span class="text-zinc-50">light z: <span id="lightzText" class="text-zinc-50">60</span></span>
-            </div>
-            <input
-              type="range"
-              min="30"
-              max="1000"
-              step="1"
-              value="60"
-              class="slider appearance-none w-full h-2 bg-sky-800 rounded-full mt-2"
-              id="lightz"
-            >
+        <div class="w-full">
+          <div class="flex mt-2 flex-1 justify-center">
+            <span class="text-zinc-50">light y: <span id="lightyText" class="text-zinc-50">60</span></span>
           </div>
-          
-          <div id="directionalButtons" class="flex flex-col">
-            <div
-              class="arrow-key-container flex flex-row items-center justify-center"
-            >
+          <input type="range" min="30" max="1000" step="1" value="60"
+            class="slider appearance-none w-full h-2 bg-sky-800 rounded-full mt-2" id="lighty">
+        </div>
+
+        <div class="w-full">
+          <div class="flex mt-2 flex-1 justify-center">
+            <span class="text-zinc-50">light z: <span id="lightzText" class="text-zinc-50">60</span></span>
+          </div>
+          <input type="range" min="30" max="1000" step="1" value="60"
+            class="slider appearance-none w-full h-2 bg-sky-800 rounded-full mt-2" id="lightz">
+        </div>
+
+        <div id="directionalButtons" class="flex flex-col">
+          <div class="arrow-key-container flex flex-row items-center justify-center">
             <div class="arrow-key plus" data-key="plus"></div>
-              <div class="arrow-key bg-sky-900" data-key="w">w</div>
-              <div class="arrow-key minus" data-key="minus"></div>
-            </div>
-            <div class="arrow-key-container flex flex-row justify-center">
-              <div class="arrow-key bg-sky-900" data-key="a">a</div>
-              <div class="arrow-key bg-sky-900" data-key="s">s</div>
-              <div class="arrow-key bg-sky-900" data-key="d">d</div>
-            </div>
-            <div class="flex flex-row justify-center">
-              <div class="arrow-key up bg-sky-700" data-key="ArrowUp"></div>
-              <div class="arrow-key down bg-sky-700" data-key="ArrowDown"></div>
-            </div>
-            <div class="flex flex-row justify-center">
-              <div class="arrow-key left bg-sky-700" data-key="ArrowLeft"></div>
-              <div
-                class="arrow-key right bg-sky-700"
-                data-key="ArrowRight"
-              ></div>
-            </div>
+            <div class="arrow-key bg-sky-900" data-key="w">w</div>
+            <div class="arrow-key minus" data-key="minus"></div>
+          </div>
+          <div class="arrow-key-container flex flex-row justify-center">
+            <div class="arrow-key bg-sky-900" data-key="a">a</div>
+            <div class="arrow-key bg-sky-900" data-key="s">s</div>
+            <div class="arrow-key bg-sky-900" data-key="d">d</div>
+          </div>
+          <div class="flex flex-row justify-center">
+            <div class="arrow-key up bg-sky-700" data-key="ArrowUp"></div>
+            <div class="arrow-key down bg-sky-700" data-key="ArrowDown"></div>
+          </div>
+          <div class="flex flex-row justify-center">
+            <div class="arrow-key left bg-sky-700" data-key="ArrowLeft"></div>
+            <div class="arrow-key right bg-sky-700" data-key="ArrowRight"></div>
           </div>
         </div>
       </div>
-      <div class="flex flex-1 justify-center p-5 text-zinc-50 border-t-2">
-        Developed By Man - 2024
-      </div>
     </div>
+    <div class="flex flex-1 justify-center p-5 text-zinc-50 border-t-2">
+      Developed By Man - 2024
+    </div>
+  </div>
 
-    <!-- SHADERS BOX -->
-    <script id="vertex-shader-3d" type="x-shader/x-vertex">
+  <!-- SHADERS BOX -->
+  <script id="vertex-shader-3d" type="x-shader/x-vertex">
       attribute vec4 a_position;
       varying vec4 v_position;
       void main() {
@@ -162,7 +126,7 @@
         gl_Position.z = 1.0;
       }
     </script>
-    <script id="fragment-shader-3d" type="x-shader/x-fragment">
+  <script id="fragment-shader-3d" type="x-shader/x-fragment">
       precision mediump float;
     
       uniform samplerCube u_skybox;
@@ -175,18 +139,19 @@
       }
     </script>
 
-        <!-- WEBGL LIB -->
-        <script src="https://webglfundamentals.org/webgl/resources/webgl-utils.js"></script>
-        <script src="https://webglfundamentals.org/webgl/resources/m4.js"></script>
-        <script src="https://webglfundamentals.org/webgl/resources/m3.js"></script>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    
-        <!-- EXTERNAL CODE JS -->
-        <script src="index.js"></script>
-        <script src="skybox.js"></script>
-        <script src="utils/audio.js"></script>
-        <script src="utils/fullscreen.js"></script>
-        <script src="utils/light.js"></script>
-        <script src="utils/handleButton.js"></script>
-  </body>
+  <!-- WEBGL LIB -->
+  <script src="https://webglfundamentals.org/webgl/resources/webgl-utils.js"></script>
+  <script src="https://webglfundamentals.org/webgl/resources/m4.js"></script>
+  <script src="https://webglfundamentals.org/webgl/resources/m3.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <!-- EXTERNAL CODE JS -->
+  <script src="utils/shadow.js"></script>
+  <script src="index.js"></script>
+  <script src="skybox.js"></script>
+  <script src="utils/audio.js"></script>
+  <script src="utils/fullscreen.js"></script>
+  <script src="utils/light.js"></script>
+  <script src="utils/handleButton.js"></script>
+</body>
+
 </html>
