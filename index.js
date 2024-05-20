@@ -1,10 +1,6 @@
 "use strict";
 
-// This is not a full .obj parser.
-// see http://paulbourke.net/dataformats/obj/
-
 var cameraPositionMain = m4.identity()
-// cameraPositionMain = m4.translation(10, 10, 10);
 let viewMatrixMain;
 let lightsEnabled = true;
 let fov = 60
@@ -576,7 +572,9 @@ const keys = {
   ArrowLeft: false,
   ArrowRight: false,
   plus: false,
-  minus: false
+  minus: false,
+  '-': false,
+  '+': false
 };
 
 // Event listeners per i tasti
@@ -668,6 +666,12 @@ function updateCameraPosition() {
     velocity +=1
   }
   if (keys['minus']) {
+    velocity--
+  }
+  if (keys['+']) {
+    velocity +=1
+  }
+  if (keys['-']) {
     velocity--
   }
 }
