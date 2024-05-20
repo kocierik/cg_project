@@ -6,9 +6,9 @@ let lightsEnabled = true;
 let shadowsEnabled = true
 let fov = 60
 let gl
-let lightx = 1
-let lighty = 1
-let lightz = 1
+let lightx = 60
+let lighty = 60
+let lightz = 60
 let velocity = 10
 var spaceshipCamera = m4.identity()
 let initialSpaceshipRotation = 0

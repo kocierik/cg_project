@@ -67,14 +67,14 @@ label {
   box-shadow: -1px 1px 0 #999, -2px 2px 0 #999, -3px 3px 0 #999999, -4px 4px 0 #999;
   color: #fff;
   display: inline-flex;
-  font-size: 30px;
+  font-size: 25px;
   font-weight: bold;
   height: 45px;
   justify-content: center;
   margin: 5px;
   transform: translate3d(0, 0, 0);
   transition: box-shadow 0.1s linear, transform 0.1s linear;
-  width: 65px;
+  width: 60px;
 }
 
 .arrow-key:active,
