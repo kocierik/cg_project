@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="author" content="Erik Koci" />
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <title>Relazione Computer Graphics</title>
+</head>
+
+<body>
+    <p class="title">Relazione Computer Graphics</p>
+    <p class="subtitle">Erik Koci - 0001136721 <br>
+        Laurea Magistrale in Informatica A.A. 2023-2024</p>
+    <hr class="solid">
+    <br>
+    <div>
+        <p class="subsection" id="indice">Indice </p>
+        <ul>
+            <li><a href="#introduzione">Introduzione</a></li>
+            <li> <a href="#interfaccia">Interfaccia</a></li>
+            <li><a href="#struttura">Struttura del progetto</a></li>
+            <li><a href="#room">Utility - directory utils</a></li>
+            <li><a href="#index">Sviluppo della sala - directory room </a></li>
+            <!-- <ul>
+                <li><a href="#camera">camera.js </a></li>
+                <li><a href="#mesh">mesh.js </a></li>
+                <li><a href="#render">render.js </a></li>
+                <li><a href="#rendering_avanzato">Rendering avanzato </a></li>
+            </ul> -->
+            <li><a href="#riferimenti">Riferimenti</a></li>
+
+    </div>
+
+    <div>
+        <p class="subsection" id="introduzione"></a>Introduzione </p>
+        Questo progetto è stato sviluppato per l'esame di "Computer Graphics A.A. 2023/2024". L'obiettivo è di
+        progettare ed implementare un'applicazione 3D interattiva usando WebGL (HTML5, CSS e contesto webgl), linguaggio
+        JavaScript e OpenGL. <br>
+        La scena è stata sviluppata con l'obiettivo di realizzare una navicella in grado di muoversi in tutte le
+        direzioni tra i pianeti e una pista. <br>
+        Tutti gli oggetti sono stata implementati usando Blender e poi importati in formato <i>.obj</i> <br>
+
+        <p class="subsection" id="interfaccia">Interfaccia</p>
+        L'interfaccia dell'applicazione è composta da due parti, il canvas per la visualizzazione 3D e una colonna con i
+        comandi per l'utente, in cui sono disegnati dei pulsanti per muoversi nello spazio. <br>
+
+        <p><img src="img/interfaccia.png" alt="interfaccia" class="img" style="width:900px;height:500px;"></p>
+
+        I movimenti nella scena possono essere gestiti attraverso la tastiera o i bottoni presenti.
+        <ul>
+            <li><b>W</b> per andare avanti </li>
+            <li> <b>S</b> per andare indietro </li>
+            <li> <b>A</b> per andare a sinistra </li>
+            <li> <b>D</b> per andare a destra </li>
+            <li> <b>+</b> per aumentare la velocita' </li>
+            <li> <b>-</b> per abbassare la velocita' </li>
+            <li> <b>↑</b> per muoversi verso l'alto </li>
+            <li> <b>↓</b> per muoversi verso il basso</li>
+            <li> <b>←</b> per ruotare verso sinistra </li>
+            <li> <b>→</b> per ruotare verso destra </li>
+        </ul>
+        <p class="subsection" id="struttura"> Struttura del progetto </p>
+        <p> All'interno della repository sono presenti i seguenti file:
+        <ul>
+            <li> <b> <i>doc</i></b>: è la repository contenente la documentazione del progetto. </li>
+            <li> <b> <i>project</i> </b>: è la repository che contiene i file utilizzati per la realizzazione del
+                progetto ed è strutturata nel seguente modo:
+                <ul>
+                    <li> <b> <i>libs: </i> </b> contiene le diverse librerie utilizzate </li>
+                    <li> <b> <i>assets: </i> </b> è organizzata in sottocartelle contenenti i file dei modelli mesh
+                        realizzati. In ogni sottocartella è presente il file <i>.obj</i> che rappresenta la geometria
+                        dell'oggetto e il file <i>.mtl</i> che contiene le informazioni delle texture e dei materiali
+                        applicati all'oggetto.</li>
+                    <li> <b> <i>utils:</i></b> è una cartella che contiene la gestione degli eventi utilizzati per la
+                        realizzazione del progetto.</li>
+                    <li> <b> <i>index.css:</i> </b> è il foglio di stile utilizzato per la realizzazione
+                        dell'interfaccia grafica. </li>
+                    <li> <b> <i>index.html:</i> </b> è il file principale del progetto, che contiene la struttura HTML e
+                        il collegamento a tutti i file javascript e fogli di stile. </li>
+                    <li> <b><i> index.js:</i></b> è il file principale nel quale viene gestito il canvas 3D e caricati i
+                        modelli mesh.</li>
+                </ul>
+            </li>
+        </ul>
+        </p>
+
+
+        <p class="subsection" id="room"></a>Utility - directory utils </p>
+        La directory <i> <b> utils</b></i> contiene i file utilizzati per la gestione degli eventi.<br>
+        I file che lo compongono sono:
+        <ul>
+            <li> <i><b>audio.js:</b></i> si occupa di attivare e disattivare l'audio. </li>
+            <li> <i><b>fullscreen.js:</b></i> gestisce la modalita' fullscreen.</li>
+            <li> <i><b>handleButton.js:</b></i> gestisce i bottoni interattivi.</li>
+            <li> <i><b>light.js:</b></i> gestisce le luci. </li>
+            <li> <i><b>shadow.js:</b></i> gestisce le ombre. </li>
+        </ul>
+        <p class="subsection" id="index"></a>Index - file index.js </p>
+        <!-- La directory <i> <b> utils</b></i> contiene i file utilizzati per la gestione degli eventi.<br>
+        I file che lo compongono sono:
+        <ul>
+            <li> <i><b>audio.js:</b></i> si occupa di attivare e disattivare l'audio. </li>
+            <li> <i><b>fullscreen.js:</b></i> gestisce la modalita' fullscreen.</li>
+            <li> <i><b>handleButton.js:</b></i> gestisce i bottoni interattivi.</li>
+            <li> <i><b>light.js:</b></i> gestisce le luci. </li>
+            <li> <i><b>shadow.js:</b></i> gestisce le ombre. </li>
+        </ul> -->
+
+        <!-- 
+    <p class="subsubsection" id="camera"> camera.js</p>
+    <p> Il file <i><b>camera.js</b></i> contiene la classe <i>Camera</i> che si occupa di gestire la camera e i suoi movimenti nello spazio. </p> 
+    L'orientamento della camera è definito da tre assi ortogonali, in cui ogni asse è un vettore in coordinate globali. <br>
+   <ul>
+        <li>position: posizione nello spazio della camera.</li>
+        <li>forward: vettore che punta davanti la camera.</li>
+        <li>right: vettore che punta alla destra della camera.</li>
+        <li>up: vettore che punta verso l'alto.</li>
+   </ul>
+   
+   I metodi che sono stati utilizzati sono: <br>
+   <ul>
+   <li><b> rotateUp(step) </b>ruota la telecamera orizzontalmente rispetto alla posizione dell’occhio della telecamera.<br>Questo movimento si ottiene usando il vettore up.</li>
+   <li><b>rotate(step)</b> ruota la telecamera verso l'alto o verso il basso.<br> Questo tipo di movimento è reso possibile attraverso la rotazione sull'asse right.</li>
+   <li><b> moveRight(dist)</b> permette di spostare la telecamera lateralmente senza modificare la direzione della visuale. <br>
+   Questo tipo di movimento è reso possibile sommando la posizione attuale della camera al prodotto della posizione attuale con la distanza fornita, sull'asse right.</li>
+   <li><b> moveUp()</b> Alza o abbassa la telecamera sul suo asse verticale.<br>
+   Questo tipo di movimento è reso possibile sommando la posizione attuale della camera al prodotto della posizione attuale con la distanza fornita, sull'asse up.</li>
+   <li><b>moveForward(d)</b> permette di allontanarsi o avvicinarsi rispetto al punto in cui si sta guardando. <br>
+   Questo tipo di movimento è reso possibile sommando la posizione attuale della camera al prodotto della posizione attuale con la distanza fornita, sull'asse forward.</li>
+   <li><b>reset()</b> permette il riallineamento della telecamera.</li>
+   <li><b>getViewMatrix()</b> restituisce la viewMatrix.</li>
+   <li><b>getPosition()</b> restituisce la posizione della telecamera.</li>
+   </ul>
+
+
+   Inoltre, all'interno di questo file, sono presenti le funzioni necessarie per la creazione e l'implementazione dei pulsanti, all'interno del canvas 2D, per gestire i movimenti base della camera: avanti, indietro, destra e sinistra. <br>
+   I tasti vengono disegnati dalla funzione <i>makeKeyCanvas</i>.
+   La funzione <i>drawButton</i> si occupa di disegnare i singoli tasti all'interno del canvas 2D, andando a salvare in un array tutti i tasti che si vogliono realizzare. <br>
+   In seguito, l'array viene iterato tramite la funzione <i>drawAll</i>, che per ogni oggetto dell'array chiama la funzione <i>drawButton</i>. Quest'ultima, si occupa della creazione dei quadrati, che rappresentano i pulsanti, e di determinarne la  dimensione, il colore e il testo da applicare. <br>
+
+   
+
+   <p class="subsubsection" id="mesh"> mesh.js</p>
+    Il file <i><b>mesh.js</b></i> contiene la classe <i>Mesh</i> che si occupa del carimento degli oggetti. <br>
+    Al suo interno è presente il metodo <b>render(gl, programInfo, uniforms)</b> che disegna l'oggetto utilizzando il programma e le uniform specificate nei parametri.
+    La funzione render globale si occupa di preparare le uniform e i parametri per i rendering per poi andare a disegnare i vari oggetti di scena attraverso la loro funzione di render.
+
+    <p class="subsubsection" id="shadows"> shadows.js</p>
+    Il file <i><b>shadows.js</b></i> si occupa dei dati per la preparazione delle ombre. 
+    In particolare:
+    <ul>
+        <li>Compila gli shaders corrispondenti. </li>
+        <li>Crea una texture utilizzata come depth map.</li>
+        <li>Imposta dei valori utilizzati in fase di rendering.</li>
+    </ul>
+
+    <p class="subsubsection" id="render"> render.js</p>
+    Il file <i><b>render.js</b></i> contiene una funziona render che si occupa di scegliere uniform e shader a seconda del tipo di rendering scelto. <br>
+    Prima di partire con il rendering la funzione si occupa di effettuare il resize del canvas, se necessario, e controllare gli input da tastiera. <br>
+    La scena può essere disegnata con due shader, con o senza ombre. <br>
+    Il rendering base supporta le texture e i colori, la luce diffusa e la specular lightning. <br>
+    <p class="img"><img src="img/rendering_base.png" alt="rendering_base" style="width:400px;height:300px;" class="img"> <b>Rendering base</b></p>
+
+    <h4 id="rendering_avanzato">Rendering avanzato </h4>
+    La prima techica di rending avanzato è il rendering con ombre, attivabile tramite la checkbox <i><b>Ombre</b></i>. <br>
+    Per poter generare le ombre la scena viene disegnata due volta, prima dal punto di vista della luce per generare una shadowmap, poi dal punto di vista dell’osservatore utilizzando la shadowmap generata per capire se un punto è in ombra o meno.
+    <br>
+    <p class="img"><img src="img/rendering_ombre.png" alt="rendering_base" style="width:400px;height:300px;" class="img"> <b>Rendering con ombre</b></p>
+
+    La seconda tecnica di rendering avanzato è stato l'effetto trasparenza su un oggetto del modello, ovvero il vetro della sala operatoria. <br>
+    L'effetto della trasparenza è dato dalla quarta componente colore di RGBA chiamata alpha. Essa misura l'opacità del texel e può assumere valori compresi tra 0 e 1.
+    <ul>
+    <li>0: il texel è completamente trasparente</li>
+    <li>1: il texel è completamente opaco</li>
+    </ul>
+    Il buffer alpha è allocato di default. Per abilitare questo buffer è stata chiamata la funzione enable(gl.BLEND) sul contesto 3D. <br>
+    In seguito è stato aggiunto all'interno del fragment shader l'attributo <i><b>uniform float opacity</b></i> il quale permette di passare il valore alpha del colore dell'oggetto. Successivamente, il valore di opacity viene moltiplicato all'interno del colore dell'oggetto. <br>
+    Per applicare l'effetto trasparente sull'oggetto, è stato necessario prima inserire la foto, che si deve intravedere nella trasparenza del vetro, e in seguito aggiungere il vetro reso trasparente modificando il valore <i>d</i> dell'oggetto vetro presente nel file <i>room.mtl</i> e settandolo a 0.2.
+
+    <p class="img"><img src="img/trasparenza.png" alt="trasparenza" style="width:400px;height:300px;" class="img"> <b>Trasparenza</b></p>
+   -->
+        <p class="subsection" id="riferimenti"></a>Riferimenti </p>
+        <a href="https://webglfundamentals.org/webgl/lessons/webgl-load-obj-w-mtl.html">WebGL Fundamentals: Loading .obj
+            with Mtl</a>
+        <br>
+        <a href="https://webglfundamentals.org/webgl/lessons/webgl-shadows.html">WebGL Fundamentals: Shadows</a>
+
+        <p><a href="#indice">Torna all’indice</a></p>
+
+    </div>
+</body>
+
+</html>
