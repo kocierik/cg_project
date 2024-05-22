@@ -3,7 +3,7 @@
 var cameraPositionMain = m4.identity()
 let viewMatrixMain;
 let lightsEnabled = true;
-let shadowsEnabled = true
+let bumpEnabled = false;
 let fov = 60
 let gl
 let lightx = 60
@@ -362,61 +362,63 @@ async function loadModel(objHref, resizeObj, positionObj, rotation, rotatePositi
     }
 `;
 
-  // Update the fragment shader to perform tangent space lighting calculations
-  const fs = `
-    precision highp float;
-    varying vec3 v_normal;
-    varying vec3 v_tangent;
-    varying vec3 v_surfaceToView;
-    varying vec2 v_texcoord;
-    varying vec4 v_color;
+const fs = `
+precision highp float;
+varying vec3 v_normal;
+varying vec3 v_tangent;
+varying vec3 v_surfaceToView;
+varying vec2 v_texcoord;
+varying vec4 v_color;
 
-    uniform int u_lightsEnabled;
-    uniform vec3 diffuse;
-    uniform sampler2D diffuseMap;
-    uniform vec3 ambient;
-    uniform vec3 emissive;
-    uniform vec3 specular;
-    uniform sampler2D specularMap;
-    uniform sampler2D normalMap; // Add normal map texture
-    uniform float shininess;
-    uniform float opacity;
-    uniform vec3 u_lightDirection;
-    uniform vec3 u_ambientLight;
+uniform int u_lightsEnabled;
+uniform int u_bumpMappingEnabled;
+uniform vec3 diffuse;
+uniform sampler2D diffuseMap;
+uniform vec3 ambient;
+uniform vec3 emissive;
+uniform vec3 specular;
+uniform sampler2D specularMap;
+uniform sampler2D normalMap; // Add normal map texture
+uniform float shininess;
+uniform float opacity;
+uniform vec3 u_lightDirection;
+uniform vec3 u_ambientLight;
 
-    void main () {
-        if (u_lightsEnabled == 1) {
-            vec3 normal = normalize(v_normal) * ( float( gl_FrontFacing ) * 2.0 - 1.0 );
-            vec3 tangent = normalize(v_tangent) * ( float( gl_FrontFacing ) * 2.0 - 1.0 );
-            vec3 bitangent = normalize(cross(normal, tangent));
+void main () {
+    if (u_lightsEnabled == 1) {
+      vec3 normal = normalize(v_normal) * ( float( gl_FrontFacing ) * 2.0 - 1.0 );
+      if (u_bumpMappingEnabled == 0) {
+        vec3 tangent = normalize(v_tangent) * ( float( gl_FrontFacing ) * 2.0 - 1.0 );
+        vec3 bitangent = normalize(cross(normal, tangent));
+        
+        mat3 tbn = mat3(tangent, bitangent, normal);
+        normal = texture2D(normalMap, v_texcoord).rgb * 2. - 1.;
+        normal = normalize(tbn * normal);
+      }
+        vec3 surfaceToViewDirection = normalize(v_surfaceToView);
+        vec3 halfVector = normalize(u_lightDirection + surfaceToViewDirection);
 
-            mat3 tbn = mat3(tangent, bitangent, normal);
-            normal = texture2D(normalMap, v_texcoord).rgb * 2. - 1.;
-            normal = normalize(tbn * normal);
+        float fakeLight = dot(u_lightDirection, normal) * .5 + .5;
+        float specularLight = clamp(dot(normal, halfVector), 0.0, 1.0);
+        vec4 specularMapColor = texture2D(specularMap, v_texcoord);
+        vec3 effectiveSpecular = specular * specularMapColor.rgb;
 
-            vec3 surfaceToViewDirection = normalize(v_surfaceToView);
-            vec3 halfVector = normalize(u_lightDirection + surfaceToViewDirection);
+        vec4 diffuseMapColor = texture2D(diffuseMap, v_texcoord);
+        vec3 effectiveDiffuse = diffuse * diffuseMapColor.rgb * v_color.rgb;
+        float effectiveOpacity = opacity * diffuseMapColor.a * v_color.a;
 
-            float fakeLight = dot(u_lightDirection, normal) * .5 + .5;
-            float specularLight = clamp(dot(normal, halfVector), 0.0, 1.0);
-            vec4 specularMapColor = texture2D(specularMap, v_texcoord);
-            vec3 effectiveSpecular = specular * specularMapColor.rgb;
-
-            vec4 diffuseMapColor = texture2D(diffuseMap, v_texcoord);
-            vec3 effectiveDiffuse = diffuse * diffuseMapColor.rgb * v_color.rgb;
-            float effectiveOpacity = opacity * diffuseMapColor.a * v_color.a;
-
-            gl_FragColor = vec4(
-                emissive +
-                ambient * u_ambientLight +
-                effectiveDiffuse * fakeLight +
-                effectiveSpecular * pow(specularLight, shininess),
-                effectiveOpacity);
-        } else {
-            gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
-        }
+        gl_FragColor = vec4(
+            emissive +
+            ambient * u_ambientLight +
+            effectiveDiffuse * fakeLight +
+            effectiveSpecular * pow(specularLight, shininess),
+            effectiveOpacity);
+    } else {
+        gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
     }
+}
 `;
+
 
 
   // compiles and links the shaders, looks up attribute and uniform locations
@@ -721,6 +723,7 @@ async function loadModel(objHref, resizeObj, positionObj, rotation, rotatePositi
       u_lightDirection: m4.normalize([lightx, lighty, -lightz]), // Vecchia luce
       u_frontLightDirection: m4.normalize([10, 50, -10]), // Nuova luce frontale
       u_lightsEnabled: lightsEnabled ? 1 : 0,
+      u_bumpMappingEnabled: bumpEnabled ? 1 : 0,
       u_view: viewMatrixMain,
       u_projection: projection,
       u_viewWorldPosition: spaceshipCamera,
@@ -731,6 +734,7 @@ async function loadModel(objHref, resizeObj, positionObj, rotation, rotatePositi
       sharedUniforms = {
         u_lightDirection: m4.normalize([0, 0, 0]),
         u_lightsEnabled: lightsEnabled ? 1 : 0,
+        u_bumpMappingEnabled: bumpEnabled ? 1 : 0,
         u_view: viewMatrixMain,
         u_projection: projection,
         u_viewWorldPosition: spaceshipCamera,

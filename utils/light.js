@@ -4,7 +4,7 @@ const toggleLightsButton = document.querySelector(
   // lightsEnabled = true; // Aggiungi questa variabile globale per tenere traccia dello stato delle luci
 
   toggleLightsButton.addEventListener("click", () => {
-    lightsEnabled = !lightsEnabled; // Cambia lo stato delle luci
+    lightsEnabled = !lightsEnabled; 
 
     // Modifica il testo del pulsante in base allo stato delle luci
     toggleLightsButton.textContent = lightsEnabled
@@ -13,14 +13,3 @@ const toggleLightsButton = document.querySelector(
   });
 
 
-const toggleShadowsButton = document.querySelector(
-  "#toggle-shadows-button"
-);
-
-toggleShadowsButton.addEventListener("click", () => {
-  shadowsEnabled = !shadowsEnabled; // Cambia lo stato delle luci
-
-  toggleShadowsButton.textContent = shadowsEnabled
-    ? "Shadows: On"
-    : "Shadows: Off";
-});
