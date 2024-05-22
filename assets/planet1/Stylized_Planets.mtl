@@ -11,6 +11,7 @@ Ni 1.000000
 d 1.000000
 illum 2
 map_Kd Mars.jpg
+map_Bump bump.jpg
 
 
 newmtl Rings
@@ -25,6 +26,7 @@ illum 2
 map_Bump 8k_saturn.jpg
 map_Kd 8k_saturn.jpg
 map_Ns uranus.jpg
+map_Bump bump.jpg
 
 newmtl Saturn
 Ns 359.999993
@@ -38,3 +40,4 @@ illum 2
 map_Bump zqw1b.jpg
 map_Kd zqw1b.jpg
 map_Ns uranus.jpg
+map_Bump bump.jpg

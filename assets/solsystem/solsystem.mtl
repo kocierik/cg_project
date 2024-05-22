@@ -11,6 +11,7 @@ d 1
 illum 2
 map_Kd profilecv.jpg
 map_Ke profilecv.jpg
+map_Bump bump.jpg
 
 newmtl mat1
 Ns 250
@@ -23,6 +24,7 @@ d 1
 illum 2
 map_Kd profilecv.jpg
 map_Ke profilecv.jpg
+map_Bump bump.jpg
 
 
 newmtl mat2
@@ -36,6 +38,7 @@ d 1
 illum 2
 map_Kd profilecv.jpg
 map_Ke profilecv.jpg
+map_Bump bump.jpg
 
 
 newmtl mat3
@@ -49,6 +52,7 @@ d 1
 illum 2
 map_Kd profilecv.jpg
 map_Ke profilecv.jpg
+map_Bump bump.jpg
 
 newmtl mat4
 Ns 250
@@ -61,6 +65,7 @@ d 1
 illum 2
 map_Kd profilecv.jpg
 map_Ke profilecv.jpg
+map_Bump bump.jpg
 
 newmtl mat5
 Ns 250
@@ -73,6 +78,7 @@ d 1
 illum 2
 map_Kd profilecv.jpg
 map_Ke profilecv.jpg
+map_Bump bump.jpg
 
 newmtl mat6
 Ns 250
@@ -85,6 +91,7 @@ d 1
 illum 2
 map_Kd profilecv.jpg
 map_Ke profilecv.jpg
+map_Bump bump.jpg
 
 newmtl mat7
 Ns 250
@@ -97,6 +104,7 @@ d 1
 illum 2
 map_Kd profilecv.jpg
 map_Ke profilecv.jpg
+map_Bump bump.jpg
 
 newmtl mat8
 Ns 250
@@ -109,6 +117,7 @@ d 1
 illum 2
 map_Kd profilecv.jpg
 map_Ke profilecv.jpg
+map_Bump bump.jpg
 
 newmtl mat9
 Ns 250
@@ -121,6 +130,7 @@ d 1
 illum 2
 map_Kd profilecv.jpg
 map_Ke profilecv.jpg
+map_Bump bump.jpg
 
 newmtl mat10
 Ns 250
@@ -133,3 +143,4 @@ d 1.0
 illum 1
 map_Kd profilecv.jpg
 map_Ke profilecv.jpg
+map_Bump bump.jpg
