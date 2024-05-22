@@ -245,7 +245,7 @@ function createTexture(gl, url) {
   // Asynchronously load an image
   const image = new Image();
   image.src = url;
-  image.addEventListener('load', function() {
+  image.addEventListener('load', function () {
     // Now that the image has loaded make copy it to the texture.
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
@@ -322,15 +322,16 @@ function generateTangents(position, texcoord, indices) {
   return tangents;
 }
 
-async function loadModel(objHref, resizeObj,positionObj,rotation,rotatePosition, spaceship, velocity,reflection) {
+async function loadModel(objHref, resizeObj, positionObj, rotation, rotatePosition, spaceship, velocity, reflection) {
   // Get A WebGL context
   /** @type {HTMLCanvasElement} */
   const canvas = document.querySelector("#canvas");
-   gl = canvas.getContext("webgl");
+  gl = canvas.getContext("webgl");
   if (!gl) {
     return;
   }
 
+  // Modify the vertex shader to pass tangent vectors to the fragment shader
   const vs = `
     attribute vec4 a_position;
     attribute vec3 a_normal;
@@ -359,66 +360,63 @@ async function loadModel(objHref, resizeObj,positionObj,rotation,rotatePosition,
       v_texcoord = a_texcoord;
       v_color = a_color;
     }
+`;
 
-  `;
-
+  // Update the fragment shader to perform tangent space lighting calculations
   const fs = `
-      precision highp float;
-      varying vec3 v_normal;
-      varying vec3 v_tangent;
-      varying vec3 v_surfaceToView;
-      varying vec2 v_texcoord;
-      varying vec4 v_color;
+    precision highp float;
+    varying vec3 v_normal;
+    varying vec3 v_tangent;
+    varying vec3 v_surfaceToView;
+    varying vec2 v_texcoord;
+    varying vec4 v_color;
 
-      uniform int u_lightsEnabled; // Nuova uniforma per abilitare/disabilitare le luci
+    uniform int u_lightsEnabled;
+    uniform vec3 diffuse;
+    uniform sampler2D diffuseMap;
+    uniform vec3 ambient;
+    uniform vec3 emissive;
+    uniform vec3 specular;
+    uniform sampler2D specularMap;
+    uniform sampler2D normalMap; // Add normal map texture
+    uniform float shininess;
+    uniform float opacity;
+    uniform vec3 u_lightDirection;
+    uniform vec3 u_ambientLight;
 
-      uniform vec3 diffuse;
-      uniform sampler2D diffuseMap;
-      uniform vec3 ambient;
-      uniform vec3 emissive;
-      uniform vec3 specular;
-      uniform sampler2D specularMap;
-      uniform float shininess;
-      uniform sampler2D normalMap;
-      uniform float opacity;
-      uniform vec3 u_lightDirection;
-      uniform vec3 u_ambientLight;
+    void main () {
+        if (u_lightsEnabled == 1) {
+            vec3 normal = normalize(v_normal) * ( float( gl_FrontFacing ) * 2.0 - 1.0 );
+            vec3 tangent = normalize(v_tangent) * ( float( gl_FrontFacing ) * 2.0 - 1.0 );
+            vec3 bitangent = normalize(cross(normal, tangent));
 
-      void main () {
-        if (u_lightsEnabled == 1) { // Controlla se le luci sono abilitate
-          vec3 normal = normalize(v_normal) * ( float( gl_FrontFacing ) * 2.0 - 1.0 );
-          vec3 tangent = normalize(v_tangent) * ( float( gl_FrontFacing ) * 2.0 - 1.0 );
-          vec3 bitangent = normalize(cross(normal, tangent));
+            mat3 tbn = mat3(tangent, bitangent, normal);
+            normal = texture2D(normalMap, v_texcoord).rgb * 2. - 1.;
+            normal = normalize(tbn * normal);
 
-          mat3 tbn = mat3(tangent, bitangent, normal);
-          normal = texture2D(normalMap, v_texcoord).rgb * 2. - 1.;
-          normal = normalize(tbn * normal);
+            vec3 surfaceToViewDirection = normalize(v_surfaceToView);
+            vec3 halfVector = normalize(u_lightDirection + surfaceToViewDirection);
 
-          vec3 surfaceToViewDirection = normalize(v_surfaceToView);
-          vec3 halfVector = normalize(u_lightDirection + surfaceToViewDirection);
+            float fakeLight = dot(u_lightDirection, normal) * .5 + .5;
+            float specularLight = clamp(dot(normal, halfVector), 0.0, 1.0);
+            vec4 specularMapColor = texture2D(specularMap, v_texcoord);
+            vec3 effectiveSpecular = specular * specularMapColor.rgb;
 
-          float fakeLight = dot(u_lightDirection, normal) * .5 + .5;
-          float specularLight = clamp(dot(normal, halfVector), 0.0, 1.0);
-          vec4 specularMapColor = texture2D(specularMap, v_texcoord);
-          vec3 effectiveSpecular = specular * specularMapColor.rgb;
+            vec4 diffuseMapColor = texture2D(diffuseMap, v_texcoord);
+            vec3 effectiveDiffuse = diffuse * diffuseMapColor.rgb * v_color.rgb;
+            float effectiveOpacity = opacity * diffuseMapColor.a * v_color.a;
 
-          vec4 diffuseMapColor = texture2D(diffuseMap, v_texcoord);
-          vec3 effectiveDiffuse = diffuse * diffuseMapColor.rgb * v_color.rgb;
-          float effectiveOpacity = opacity * diffuseMapColor.a * v_color.a;
-
-          gl_FragColor = vec4(
-            emissive +
-            ambient * u_ambientLight +
-            effectiveDiffuse * fakeLight +
-            effectiveSpecular * pow(specularLight, shininess),
-            effectiveOpacity);
+            gl_FragColor = vec4(
+                emissive +
+                ambient * u_ambientLight +
+                effectiveDiffuse * fakeLight +
+                effectiveSpecular * pow(specularLight, shininess),
+                effectiveOpacity);
         } else {
-          // Se le luci sono disabilitate, rendi il pixel completamente nero
-          gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+            gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
         }
-      }
-
-  `;
+    }
+`;
 
 
   // compiles and links the shaders, looks up attribute and uniform locations
@@ -562,257 +560,252 @@ async function loadModel(objHref, resizeObj,positionObj,rotation,rotatePosition,
     return deg * Math.PI / 180;
   }
 
-// Variabili per memorizzare lo stato dei tasti
-const keys = {
-  w: false,
-  a: false,
-  s: false,
-  d: false,
-  ArrowUp: false,
-  ArrowDown: false,
-  ArrowLeft: false,
-  ArrowRight: false,
-  plus: false,
-  minus: false,
-  '-': false,
-  '+': false
-};
+  // Variabili per memorizzare lo stato dei tasti
+  const keys = {
+    w: false,
+    a: false,
+    s: false,
+    d: false,
+    ArrowUp: false,
+    ArrowDown: false,
+    ArrowLeft: false,
+    ArrowRight: false,
+    plus: false,
+    minus: false,
+    '-': false,
+    '+': false
+  };
 
-// Event listeners per i tasti
-window.addEventListener('keydown', handleKeyDown);
-window.addEventListener('keyup', handleKeyUp);
+  // Event listeners per i tasti
+  window.addEventListener('keydown', handleKeyDown);
+  window.addEventListener('keyup', handleKeyUp);
 
-function handleKeyDown(event) {
-  const key = event.key.toLowerCase();
+  function handleKeyDown(event) {
+    const key = event.key.toLowerCase();
     keys[key] = true;
     updateCameraPosition();
-}
+  }
 
-function handleKeyUp(event) {
-  const key = event.key.toLowerCase();
+  function handleKeyUp(event) {
+    const key = event.key.toLowerCase();
     keys[key] = false;
     updateCameraPosition();
-}
+  }
 
-// Event listeners per i bottoni direzionali
-document.querySelectorAll(".arrow-key").forEach(function(button) {
-  const keyCode = button.getAttribute("data-key");
-  
-  button.addEventListener("mousedown", function(e) {
-    keys[keyCode] = true;
-    updateCameraPosition();
+  // Event listeners per i bottoni direzionali
+  document.querySelectorAll(".arrow-key").forEach(function (button) {
+    const keyCode = button.getAttribute("data-key");
+
+    button.addEventListener("mousedown", function (e) {
+      keys[keyCode] = true;
+      updateCameraPosition();
+    });
+
+    button.addEventListener("mouseup", function (e) {
+      keys[keyCode] = false;
+      updateCameraPosition();
+    });
+
+    button.addEventListener("mouseout", function (e) {
+      keys[keyCode] = false;
+      updateCameraPosition();
+    });
   });
-  
-  button.addEventListener("mouseup", function(e) {
-    keys[keyCode] = false;
-    updateCameraPosition();
-  });
-
-  button.addEventListener("mouseout", function(e) {
-    keys[keyCode] = false;
-    updateCameraPosition();
-  });
-});
 
 
 
-// Funzione per aggiornare la posizione della camera in base ai tasti premuti
-function updateCameraPosition() {
-  if (keys['w']) {
-    m4.translate(cameraPositionMain, 0, 0, -velocity, cameraPositionMain);
+  // Funzione per aggiornare la posizione della camera in base ai tasti premuti
+  function updateCameraPosition() {
+    if (keys['w']) {
+      m4.translate(cameraPositionMain, 0, 0, -velocity, cameraPositionMain);
+    }
+    if (keys['a']) {
+      m4.translate(cameraPositionMain, -velocity, 0, 0, cameraPositionMain);
+    }
+    if (keys['s']) {
+      m4.translate(cameraPositionMain, 0, 0, velocity, cameraPositionMain);
+    }
+    if (keys['d']) {
+      m4.translate(cameraPositionMain, velocity, 0, 0, cameraPositionMain);
+      // cameraPositionMain = m4.translation(10, 10, 10);
+    }
+    if (keys['ArrowUp']) {
+      m4.translate(cameraPositionMain, 0, velocity, 0, cameraPositionMain);
+    }
+    if (keys['ArrowDown']) {
+      m4.translate(cameraPositionMain, 0, -velocity, 0, cameraPositionMain);
+    }
+    if (keys['ArrowLeft']) {
+      m4.yRotate(cameraPositionMain, degToRad(0.5), cameraPositionMain);
+      m4.zRotate(spaceshipCamera, degToRad(-0.1), spaceshipCamera);
+      initialSpaceshipRotation -= 0.1
+    }
+    if (keys['ArrowRight']) {
+      m4.yRotate(cameraPositionMain, degToRad(-0.5), cameraPositionMain);
+      m4.zRotate(spaceshipCamera, degToRad(0.1), spaceshipCamera);
+      initialSpaceshipRotation += 0.1
+    }
+    if (keys['arrowup']) {
+      m4.translate(cameraPositionMain, 0, velocity, 0, cameraPositionMain);
+    }
+    if (keys['arrowdown']) {
+      m4.translate(cameraPositionMain, 0, -velocity, 0, cameraPositionMain);
+    }
+    if (keys['arrowleft']) {
+      m4.yRotate(cameraPositionMain, degToRad(0.5), cameraPositionMain);
+      m4.zRotate(spaceshipCamera, degToRad(-0.1), spaceshipCamera);
+      initialSpaceshipRotation -= 0.1
+    }
+    if (keys['arrowright']) {
+      m4.yRotate(cameraPositionMain, degToRad(-0.5), cameraPositionMain);
+      m4.zRotate(spaceshipCamera, degToRad(0.1), spaceshipCamera);
+      initialSpaceshipRotation += 0.1
+    }
+    if (keys['plus']) {
+      velocity += 1
+    }
+    if (keys['minus']) {
+      velocity--
+    }
+    if (keys['+']) {
+      velocity += 1
+    }
+    if (keys['-']) {
+      velocity--
+    }
   }
-  if (keys['a']) {
-    m4.translate(cameraPositionMain, -velocity, 0, 0, cameraPositionMain);
-  }
-  if (keys['s']) {
-    m4.translate(cameraPositionMain, 0, 0, velocity, cameraPositionMain);
-  }
-  if (keys['d']) {
-    m4.translate(cameraPositionMain, velocity, 0, 0, cameraPositionMain);
-    // cameraPositionMain = m4.translation(10, 10, 10);
-  }
-  if (keys['ArrowUp']) {
-    m4.translate(cameraPositionMain, 0, velocity, 0, cameraPositionMain);
-  }
-  if (keys['ArrowDown']) {
-    m4.translate(cameraPositionMain, 0, -velocity, 0, cameraPositionMain);
-  }
-  if (keys['ArrowLeft']) {
-    m4.yRotate(cameraPositionMain, degToRad(0.5), cameraPositionMain);
-    m4.zRotate(spaceshipCamera, degToRad(-0.1), spaceshipCamera);
-    initialSpaceshipRotation -= 0.1
-  }
-  if (keys['ArrowRight']) {
-    m4.yRotate(cameraPositionMain, degToRad(-0.5), cameraPositionMain);
-    m4.zRotate(spaceshipCamera, degToRad(0.1), spaceshipCamera);
-    initialSpaceshipRotation += 0.1
-  }
-  if (keys['arrowup']) {
-    m4.translate(cameraPositionMain, 0, velocity, 0, cameraPositionMain);
-  }
-  if (keys['arrowdown']) {
-    m4.translate(cameraPositionMain, 0, -velocity, 0, cameraPositionMain);
-  }
-  if (keys['arrowleft']) {
-    m4.yRotate(cameraPositionMain, degToRad(0.5), cameraPositionMain);
-    m4.zRotate(spaceshipCamera, degToRad(-0.1), spaceshipCamera);
-    initialSpaceshipRotation -= 0.1
-  }
-  if (keys['arrowright']) {
-    m4.yRotate(cameraPositionMain, degToRad(-0.5), cameraPositionMain);
-    m4.zRotate(spaceshipCamera, degToRad(0.1), spaceshipCamera);
-    initialSpaceshipRotation += 0.1
-  }
-  if (keys['plus']) {
-    velocity +=1
-  }
-  if (keys['minus']) {
-    velocity--
-  }
-  if (keys['+']) {
-    velocity +=1
-  }
-  if (keys['-']) {
-    velocity--
-  }
-}
 
 
-function resizeObject(resizeObj, u_world) {
-  // Crea la matrice di scala
-  const scaleMatrix = m4.scaling(resizeObj, resizeObj, resizeObj);
-  // Moltiplica la matrice di scala per u_world
-  return m4.multiply(u_world, scaleMatrix);
-}
+  function resizeObject(resizeObj, u_world) {
+    // Crea la matrice di scala
+    const scaleMatrix = m4.scaling(resizeObj, resizeObj, resizeObj);
+    // Moltiplica la matrice di scala per u_world
+    return m4.multiply(u_world, scaleMatrix);
+  }
 
-function moveObject(positionObj, u_world) {
-  // Crea la matrice di traslazione
-  const translationMatrix = m4.translation(positionObj[0], positionObj[1], positionObj[2]);
+  function moveObject(positionObj, u_world) {
+    // Crea la matrice di traslazione
+    const translationMatrix = m4.translation(positionObj[0], positionObj[1], positionObj[2]);
 
-  // Moltiplica la matrice di traslazione per u_world
-  return m4.multiply(translationMatrix, u_world);
-}
+    // Moltiplica la matrice di traslazione per u_world
+    return m4.multiply(translationMatrix, u_world);
+  }
 
-function rotateObject(rotatePosition, u_world) {
-  // Crea le matrici di rotazione per gli assi x, y e z
-  const xRotationMatrix = m4.xRotation(degToRad(rotatePosition[0]));
-  const yRotationMatrix = m4.yRotation(degToRad(rotatePosition[1]));
-  const zRotationMatrix = m4.zRotation(degToRad(rotatePosition[2]));
+  function rotateObject(rotatePosition, u_world) {
+    // Crea le matrici di rotazione per gli assi x, y e z
+    const xRotationMatrix = m4.xRotation(degToRad(rotatePosition[0]));
+    const yRotationMatrix = m4.yRotation(degToRad(rotatePosition[1]));
+    const zRotationMatrix = m4.zRotation(degToRad(rotatePosition[2]));
 
-  // Moltiplica le matrici di rotazione per u_world
-  return m4.multiply(m4.multiply(m4.multiply(u_world, xRotationMatrix), yRotationMatrix), zRotationMatrix);
-}
+    // Moltiplica le matrici di rotazione per u_world
+    return m4.multiply(m4.multiply(m4.multiply(u_world, xRotationMatrix), yRotationMatrix), zRotationMatrix);
+  }
 
-function render(time) {
-  time *= rotation;  // convert to seconds
-  
-  webglUtils.resizeCanvasToDisplaySize(gl.canvas);
-  gl.clearColor(0, 0, 0, 1);
-  gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-  gl.enable(gl.DEPTH_TEST);
-  
-  const fieldOfViewRadians = degToRad(fov);
-  const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
-  const projection = m4.perspective(fieldOfViewRadians, aspect, zNear, zFar);
-  
-  // const up = [0, 1, 0];
-  var sharedUniforms
-  viewMatrixMain = m4.inverse(cameraPositionMain);
-  sharedUniforms = {
-    // u_lightDirection: m4.normalize([-1, 3, 5]), // Vecchia luce
-    u_lightDirection: m4.normalize([lightx, lighty, -lightz]), // Vecchia luce
-    u_frontLightDirection: m4.normalize([10, 50, -1]), // Nuova luce frontale
-    u_lightsEnabled: lightsEnabled ? 1 : 0,
-    u_view: viewMatrixMain,
-    u_projection: projection,
-    u_viewWorldPosition: spaceshipCamera,
-  }; 
+  function render(time) {
+    time *= rotation;  // convert to seconds
 
-  if(spaceship){
-    viewMatrixMain = m4.inverse(spaceshipCamera);
+    webglUtils.resizeCanvasToDisplaySize(gl.canvas);
+    gl.clearColor(0, 0, 0, 1);
+    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+    gl.enable(gl.DEPTH_TEST);
+
+    const fieldOfViewRadians = degToRad(fov);
+    const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
+    const projection = m4.perspective(fieldOfViewRadians, aspect, zNear, zFar);
+
+    // const up = [0, 1, 0];
+    var sharedUniforms
+    viewMatrixMain = m4.inverse(cameraPositionMain);
     sharedUniforms = {
-      u_lightDirection: m4.normalize([-1, 3, 5]),
-      u_lightsEnabled: lightsEnabled ? 1 : 0, 
+      // u_lightDirection: m4.normalize([-1, 3, 5]), // Vecchia luce
+      u_lightDirection: m4.normalize([lightx, lighty, -lightz]), // Vecchia luce
+      u_frontLightDirection: m4.normalize([10, 50, -10]), // Nuova luce frontale
+      u_lightsEnabled: lightsEnabled ? 1 : 0,
       u_view: viewMatrixMain,
       u_projection: projection,
       u_viewWorldPosition: spaceshipCamera,
     };
-  } 
 
-  
-  if(initialSpaceshipRotation > 0){
+    if (spaceship) {
+      viewMatrixMain = m4.inverse(spaceshipCamera);
+      sharedUniforms = {
+        u_lightDirection: m4.normalize([0, 0, 0]),
+        u_lightsEnabled: lightsEnabled ? 1 : 0,
+        u_view: viewMatrixMain,
+        u_projection: projection,
+        u_viewWorldPosition: spaceshipCamera,
+      };
+    }
+
+
+    if (initialSpaceshipRotation > 0) {
       m4.zRotate(spaceshipCamera, degToRad(-0.1), spaceshipCamera);
       initialSpaceshipRotation -= 0.1
-  } else if(initialSpaceshipRotation < 0) {
-    m4.zRotate(spaceshipCamera, degToRad(0.1), spaceshipCamera);
-    initialSpaceshipRotation += 0.1
-  }
+    } else if (initialSpaceshipRotation < 0) {
+      m4.zRotate(spaceshipCamera, degToRad(0.1), spaceshipCamera);
+      initialSpaceshipRotation += 0.1
+    }
+
+    gl.useProgram(meshProgramInfo.program);
 
 
-  gl.useProgram(meshProgramInfo.program);
 
-  // calls gl.uniform
-  webglUtils.setUniforms(meshProgramInfo, sharedUniforms);
-
-  // compute the world matrix once since all parts
-  // are at the same space.
-  let u_world = m4.yRotation(time);
-  u_world = m4.translate(u_world, ...objOffset);
-
-  // Ridimensiona l'oggetto
-  u_world = resizeObject(resizeObj, u_world);
-
-  u_world = moveObject(positionObj,u_world)
-
-  u_world = rotateObject(rotatePosition,u_world)
-
-  
-  for (const { bufferInfo, material } of parts) {
-    // calls gl.bindBuffer, gl.enableVertexAttribArray, gl.vertexAttribPointer
-    webglUtils.setBuffersAndAttributes(gl, meshProgramInfo, bufferInfo);
     // calls gl.uniform
-    webglUtils.setUniforms(meshProgramInfo, {
-      u_world,
-    }, material);
-    // calls gl.drawArrays or gl.drawElements
-    webglUtils.drawBufferInfo(gl, bufferInfo);
+    webglUtils.setUniforms(meshProgramInfo, sharedUniforms);
+
+    // compute the world matrix once since all parts
+    // are at the same space.
+    let u_world = m4.yRotation(time);
+    u_world = m4.translate(u_world, ...objOffset);
+
+    // Ridimensiona l'oggetto
+    u_world = resizeObject(resizeObj, u_world);
+
+    u_world = moveObject(positionObj, u_world)
+
+    u_world = rotateObject(rotatePosition, u_world)
+
+
+    for (const { bufferInfo, material } of parts) {
+      // calls gl.bindBuffer, gl.enableVertexAttribArray, gl.vertexAttribPointer
+      webglUtils.setBuffersAndAttributes(gl, meshProgramInfo, bufferInfo);
+      // calls gl.uniform
+      webglUtils.setUniforms(meshProgramInfo, {
+        u_world,
+      }, material);
+      // calls gl.drawArrays or gl.drawElements
+      webglUtils.drawBufferInfo(gl, bufferInfo);
+    }
+
+    requestAnimationFrame(render);
+    updateCameraPosition(velocity)
   }
 
   requestAnimationFrame(render);
-  updateCameraPosition(velocity)
 }
 
-  requestAnimationFrame(render);
-}
 
-loadModel(
-  'assets/solar/solar.obj', 
-  40, // Resize object: [scaleX, scaleY, scaleZ]
-  [1000,500,-1500], // Position object: [x, y, z]
-  0.0001,         //  rotation
-  [0,0,0], // Rotate position: [rotateX, rotateY, rotateZ]
-  false,      // spaceship mode
-  10,        // velocity
-  false      // reflection
-);
-loadModel("assets/spaceship/justigue league flying vehicle.obj",1,[0,-90,-400],0,[0,180,0],true,velocity,false);
-loadModel("assets/solsystem/system.obj",20,[4000,1600,5000],0.0001,[-90,0,0],false,10,false);
-loadModel("assets/rainbow/rainbow.obj",100,[0,350,-180],0,[180,230,170],false,10,true);
+document.addEventListener("DOMContentLoaded", function () {
+  var loadingText = document.getElementById("loadingText");
+  var canvas = document.getElementById("canvas");
 
-// document.addEventListener("DOMContentLoaded", function() {
-//   var loadingText = document.getElementById("loadingText");
-//   var canvas = document.getElementById("canvas");
+  function hideLoadingText() {
+    loadingText.style.display = "none";
+    canvas.style.display = "block";
+  }
 
-//   function hideLoadingText() {
-//     loadingText.style.display = "none";
-//     canvas.style.display = "block";
-//   }
-
-//   loadModel("solar/solar.obj",40,[1000,-200,-1500],0.0001,[0,0,0],false,10,false);
-//   // loadModel("planet1/Stylized_Planets.obj",300,[2000,0,4500],0.0001,[0,0,0],false,10,false);
-//   loadModel("spaceship/justigue league flying vehicle.obj",1,[0,-90,-400],0,[0,180,0],true,10,false);
-//   loadModel("solsystem/system.obj",20,[4000,1600,5000],0.0001,[-90,0,0],false,10,false);
-//   loadModel("rainbow/untitled.obj",100,[-30,0,-100],0,[180,210,180],false,10,true);
-//   // loadModel("mirror/mirror.obj",50,[-5000,-900,-1000],0,[180,0,90],false,10,true);
-//   setTimeout(hideLoadingText, 3000);
-// });
+  loadModel(
+    'assets/solar/solar.obj',
+    40, // Resize object: [scaleX, scaleY, scaleZ]
+    [1000, 500, -1500], // Position object: [x, y, z]
+    0.0001,         //  rotation
+    [0, 0, 0], // Rotate position: [rotateX, rotateY, rotateZ]
+    false,      // spaceship mode
+    10,        // velocity
+    false      // reflection
+  );
+  loadModel("assets/spaceship/justigue league flying vehicle.obj", 1, [0, -90, -400], 0, [0, 180, 0], true, velocity, false);
+  loadModel("assets/solsystem/system.obj", 20, [4000, 1600, 5000], 0.0001, [-90, 0, 0], false, 10, false);
+  loadModel("assets/rainbow/rainbow.obj", 100, [0, 350, -180], 0, [180, 230, 170], false, 10, true);
+  setTimeout(hideLoadingText, 3000);
+});

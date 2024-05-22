@@ -10,7 +10,8 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 1.000000
 illum 2
-map_Kd profilecv.jpg
+map_Kd 8k_sun.jpg
+map_Bump bump.jpg
 
 newmtl Material.002
 Ns 225.000000
