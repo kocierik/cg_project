@@ -9,7 +9,7 @@ Ks 0 0 0
 Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 1.000000
-illum 2
+illum 1
 map_Kd 8k_sun.jpg
 map_Bump bump.jpg
 map_Ns profilecv.jpg
@@ -22,7 +22,7 @@ Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
-illum 2
+illum 1
 map_Kd merkur.jpg
 map_Bump bump.jpg
 
@@ -34,7 +34,7 @@ Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
-illum 2
+illum 1
 map_Kd venus.jpg
 map_Bump bump.jpg
 
@@ -46,7 +46,7 @@ Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
-illum 2
+illum 1
 map_Kd earth.jpg
 map_Bump bump.jpg
 
@@ -58,7 +58,7 @@ Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
-illum 2
+illum 1
 map_Kd Mars.jpg
 map_Bump bump.jpg
 
@@ -70,7 +70,7 @@ Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
-illum 2
+illum 1
 map_Kd fede.jpeg
 map_Bump bump.jpg
 
@@ -82,7 +82,7 @@ Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
-illum 2
+illum 1
 map_Kd 8k_jupiter.jpg
 map_Bump bump.jpg
 
@@ -94,7 +94,7 @@ Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
-illum 2
+illum 1
 map_Kd 8k_saturn.jpg
 map_Bump bump.jpg
 
@@ -106,7 +106,7 @@ Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
-illum 2
+illum 1
 map_Kd uranus.jpg
 map_Bump bump.jpg
 
@@ -118,7 +118,7 @@ Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
-illum 2
+illum 1
 map_Kd Neptune.jpg
 map_Bump bump.jpg
 
@@ -128,6 +128,6 @@ Ka 0.8 0.8 0.8
 Kd 0.8 0.8 0.8
 Ks 0 0 0
 d 1
-illum 2
+illum 1
 map_Kd Moon.jpg
 map_Bump bump.jpg
