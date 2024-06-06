@@ -9,142 +9,157 @@
 </head>
 
 <body>
-    <p class="title">Relazione Computer Graphics</p>
-    <p class="subtitle">Erik Koci - 0001136721 <br>
-        Laurea Magistrale in Informatica A.A. 2023-2024</p>
-    <hr class="solid">
-    <br>
-    <div>
-        <p class="subsection" id="indice">Indice </p>
-        <ul>
-            <li><a href="#introduzione">Introduzione</a></li>
-            <li> <a href="#interfaccia">Interfaccia</a></li>
-            <li><a href="#struttura">Struttura del progetto</a></li>
-            <li><a href="#room">Utility - directory utils</a></li>
-            <li><a href="#js">Gestione e caricamento degli oggetti - directory js </a></li>
-            <li><a href="#index">loadObj, fulcro del progetto </a></li>
-            <li><a href="#feature">Feature opzionali </a></li>
-            <li><a href="#rendering_avanzato">bump mapping, rendering avanzato </a></li>
-            <li><a href="#demo">DEMO </a></li>
-            
-            <!-- <ul>
-                <li><a href="#camera">camera.js </a></li>
-                <li><a href="#mesh">mesh.js </a></li>
-                <li><a href="#render">render.js </a></li>
-                <li><a href="#rendering_avanzato">Rendering avanzato </a></li>
-            </ul> -->
-            <li><a href="#riferimenti">Riferimenti</a></li>
-
-    </div>
-
-    <div>
-        <p class="subsection" id="introduzione"></a>Introduzione </p>
-        Questo progetto è stato sviluppato per l'esame di "Computer Graphics A.A. 2023/2024". L'obiettivo è di
-        progettare ed implementare un'applicazione 3D interattiva usando WebGL (HTML5, CSS e contesto webgl), linguaggio
-        JavaScript e OpenGL. <br>
-        La scena è stata sviluppata con l'obiettivo di realizzare una navicella in grado di muoversi in tutte le
-        direzioni tra i pianeti e una pista. <br>
-        Tutti gli oggetti sono stata implementati usando Blender e poi importati in formato <i>.obj</i> <br>
-
-        <p class="subsection" id="interfaccia">Interfaccia</p>
-        L'interfaccia dell'applicazione è composta da due parti, il canvas per la visualizzazione 3D e una colonna con i
-        comandi per l'utente, in cui sono disegnati dei pulsanti per muoversi nello spazio. <br>
-
-        <p><img src="img/interfaccia.png" alt="interfaccia" class="img" style="width:900px;height:500px;"></p>
-
-        I movimenti nella scena possono essere gestiti attraverso la tastiera o i bottoni presenti.
-        <ul>
-            <li><b>W</b> per andare avanti </li>
-            <li> <b>S</b> per andare indietro </li>
-            <li> <b>A</b> per andare a sinistra </li>
-            <li> <b>D</b> per andare a destra </li>
-            <li> <b>+</b> per aumentare la velocita' </li>
-            <li> <b>-</b> per abbassare la velocita' </li>
-            <li> <b>↑</b> per muoversi verso l'alto </li>
-            <li> <b>↓</b> per muoversi verso il basso</li>
-            <li> <b>←</b> per ruotare verso sinistra </li>
-            <li> <b>→</b> per ruotare verso destra </li>
-        </ul>
-        <p class="subsection" id="struttura"> Struttura del progetto </p>
-        <p> All'interno della repository sono presenti i seguenti file:
-        <ul>
-            <li> <b> <i>doc</i></b>: è la repository contenente la documentazione del progetto. </li>
-            <li> <b> <i>project</i> </b>: è la repository che contiene i file utilizzati per la realizzazione del
-                progetto ed è strutturata nel seguente modo:
-                <ul>
-                    <li> <b> <i>libs: </i> </b> contiene le diverse librerie utilizzate </li>
-                    <li> <b> <i>assets: </i> </b> è organizzata in sottocartelle contenenti i file dei modelli mesh
-                        realizzati. In ogni sottocartella è presente il file <i>.obj</i> che rappresenta la geometria
-                        dell'oggetto e il file <i>.mtl</i> che contiene le informazioni delle texture e dei materiali
-                        applicati all'oggetto.</li>
-                    <li> <b> <i>utils:</i></b> è una cartella che contiene la gestione degli eventi utilizzati per la
-                        realizzazione del progetto.</li>
-                    <li> <b> <i>js:</i></b> è una cartella che contiene gli script utili per il caricamento e la gestione dei modelli.</li>
-                    <li> <b> <i>index.css:</i> </b> è il foglio di stile utilizzato per la realizzazione
-                        dell'interfaccia grafica. </li>
-                    <li> <b> <i>index.html:</i> </b> è il file principale del progetto, che contiene la struttura HTML e
-                        il collegamento a tutti i file javascript e fogli di stile. </li>
-                    <li> <b><i> index.js:</i></b> è il file principale nel quale viene gestito il canvas 3D e caricati i
-                        modelli mesh.</li>
-                </ul>
-            </li>
-        </ul>
-        </p>
-
-
-        <p class="subsection" id="room"></a>Utility - directory utils </p>
-        La directory <i> <b> utils</b></i> contiene i file utilizzati per la gestione degli eventi.<br>
-        I file che lo compongono sono:
-        <ul>
-            <li> <i><b>audio.js:</b></i> si occupa di attivare e disattivare l'audio. </li>
-            <li> <i><b>fullscreen.js:</b></i> gestisce la modalita' fullscreen.</li>
-            <li> <i><b>handleButton.js:</b></i> gestisce i bottoni interattivi.</li>
-            <li> <i><b>light.js:</b></i> gestisce le luci. </li>
-            <li> <i><b>bump.js:</b></i> gestisce il bump mapping. </li>
-        </ul>
-
-        <p class="subsection" id="js"></a>JS - directory js </p>
-        La directory <i> <b> js</b></i> contiene i file utilizzati per il caricamento e la gestione del modello, fondamentale per il funzionamento.<br>
-        I file che lo compongono sono:
-        <ul>
-            <li> <i><b>editObj.js:</b></i> si occupa di modificare le forme e la posizione degli object. </li>
-            <li> <i><b>handleKey.js:</b></i> gestisce gli input da tastiera.</li>
-            <li> <i><b>loadObj.js:</b></i> carica gli obj e gestisce gli mtl di esso.</li>
-            <li> <i><b>shaders.js:</b></i> contiene i vertex e i fragment shaders . </li>
-            <li> <i><b>tangent.js:</b></i> gestisce le tangenti applicate all'oggetto dei modelli. </li>
-            <li> <i><b>texture.js:</b></i> crea delle semplici texture. </li>
-        </ul>
-
-        <p class="subsection" id="index"></a>Index - file index.js </p>
-        Contiene la funzione <i><b>loadModel</b></i> che si occupa dell'intera gestione e del rendering degli oggetti, richiamando tutte le funzioni utili
-        definite nella cartella <i><b>js</b></i>.
-
-        <p class="subsection" id="feature"></a>Feature opzionali </p>
-        Nell'interfaccia sono presenti anche altre feature opzionali, come ad esempio la modalita' fullscreen, per entrare a pieno nel canvas, e l'audio per un atmosfera differente. 
-        E' possibile attivare e disattivare le luci per visualizzare gli oggetti senza colori.
-
-        <h2 id="rendering_avanzato">Rendering avanzato </h2>
-        La tecnica di rending avanzato è il bump mapping, attivabile tramite il bottone <i><b>Bump</b></i>. <br>
-        Alla texture che ricopre l'oggetto viene "sovrapposta" una seconda texture che il motore di rendering utilizza per simulare sporgenze.
-        Per implementare il bump mapping, è necessario associare la mappa di altezza al materiale della superficie.
-        Quando la luce colpisce la superficie durante il processo di rendering,
-        si tiene conto delle informazioni fornite per calcolare in modo realistico la riflessione della luce sulla superficie.
+    <div class="border">
+        <p class="title">Relazione Computer Graphics</p>
+        <p class="subtitle">Erik Koci - 0001136721 <br>
+            Laurea Magistrale in Informatica A.A. 2023-2024</p>
+        <hr class="solid">
         <br>
-        
-        <p class="img"><img src="img/bump.png" alt="bump_mapping" style="width:900px;height:500px;" class="img"> <b>Rendering con bump mapping</b></p>
-    
-        <h2 id="demo">Demo </h2>
-        <video style="width:900px;height:500px;" controls>
-            <source src="demo.mp4" type="video/mp4">
-          Your browser does not support the video tag.
-          </video> 
+        <div>
+            <p class="subsection" id="indice">Indice </p>
+            <ul>
+                <li><a href="#introduzione">Introduzione</a></li>
+                <li> <a href="#interfaccia">Interfaccia</a></li>
+                <li><a href="#struttura">Struttura del progetto</a></li>
+                <li><a href="#room">Utility - directory utils</a></li>
+                <li><a href="#js">Gestione e caricamento degli oggetti - directory js </a></li>
+                <li><a href="#index">loadObj, fulcro del progetto </a></li>
+                <li><a href="#feature">Feature opzionali </a></li>
+                <li><a href="#rendering_avanzato">bump mapping, rendering avanzato </a></li>
+                <li><a href="#riferimenti">Riferimenti</a></li>
 
-        <p class="subsection" id="riferimenti"></a>Riferimenti </p>
-        <a href="https://webglfundamentals.org/webgl/lessons/webgl-load-obj-w-mtl.html">WebGL Fundamentals: Loading .obj
-            with Mtl</a>
-        <br>
-        <p><a href="#indice">Torna all’indice</a></p>
+        </div>
 
+        <div>
+            <p class="subsection" id="introduzione"></a>Introduzione </p>
+            Questo progetto è stato sviluppato per l'esame di "Computer Graphics A.A. 2023/2024". L'obiettivo è di
+            progettare ed implementare un'applicazione 3D interattiva usando WebGL (HTML5, CSS e contesto webgl),
+            linguaggio
+            JavaScript e OpenGL. <br>
+            La scena è stata sviluppata con l'obiettivo di realizzare una navicella in grado di muoversi in tutte le
+            direzioni tra i pianeti e una pista. <br>
+            Tutti gli oggetti sono stata importati e modificati usando Blender per poi essere convertiti in formato <i>.obj</i> <br>
+
+            <p class="subsection" id="interfaccia">Interfaccia</p>
+            L'interfaccia dell'applicazione è composta da due parti, il canvas per la visualizzazione 3D e una colonna
+            con i
+            comandi per l'utente, in cui sono disegnati dei pulsanti per muoversi nello spazio. <br>
+
+            <p><img src="img/interfaccia.png" alt="interfaccia" class="img" style="width:900px;height:500px;"></p>
+
+            I movimenti nella scena possono essere gestiti attraverso la tastiera o i bottoni presenti.
+            <ul>
+                <li><b>W</b> per andare avanti </li>
+                <li> <b>S</b> per andare indietro </li>
+                <li> <b>A</b> per andare a sinistra </li>
+                <li> <b>D</b> per andare a destra </li>
+                <li> <b>+</b> per aumentare la velocita' </li>
+                <li> <b>-</b> per abbassare la velocita' </li>
+                <li> <b>↑</b> per muoversi verso l'alto </li>
+                <li> <b>↓</b> per muoversi verso il basso</li>
+                <li> <b>←</b> per ruotare verso sinistra </li>
+                <li> <b>→</b> per ruotare verso destra </li>
+            </ul>
+            <p class="subsection" id="struttura"> Struttura del progetto </p>
+            <p> All'interno della repository sono presenti i seguenti file:
+            <ul>
+                <li> <b> <i>doc</i></b>: è la repository contenente la documentazione del progetto. </li>
+                <li> <b> <i>project</i> </b>: è la repository che contiene i file utilizzati per la realizzazione del
+                    progetto ed è strutturata nel seguente modo:
+                    <ul>
+                        <li> <b> <i>libs: </i> </b> contiene le diverse librerie utilizzate </li>
+                        <li> <b> <i>assets: </i> </b> è organizzata in sottocartelle contenenti i file dei modelli mesh
+                            realizzati. In ogni sottocartella è presente il file <i>.obj</i> che rappresenta la
+                            geometria
+                            dell'oggetto e il file <i>.mtl</i> che contiene le informazioni delle texture e dei
+                            materiali
+                            applicati all'oggetto.</li>
+                        <li> <b> <i>utils:</i></b> è una cartella che contiene la gestione degli eventi utilizzati per
+                            la
+                            realizzazione del progetto.</li>
+                        <li> <b> <i>js:</i></b> è una cartella che contiene gli script utili per il caricamento e la
+                            gestione dei modelli.</li>
+                        <li> <b> <i>index.css:</i> </b> è il foglio di stile utilizzato per la realizzazione
+                            dell'interfaccia grafica. </li>
+                        <li> <b> <i>index.html:</i> </b> è il file principale del progetto, che contiene la struttura
+                            HTML e
+                            il collegamento a tutti i file javascript e fogli di stile. </li>
+                        <li> <b><i> index.js:</i></b> è il file principale nel quale viene gestito il canvas 3D e
+                            caricati i
+                            modelli mesh.</li>
+                        <li> <b><i> skybox.js:</i></b> è il file nel quale viene gestita e caricata la skybox.</li>
+                    </ul>
+                </li>
+            </ul>
+            </p>
+
+
+            <p class="subsection" id="room"></a>Utility - directory utils </p>
+            La directory <i> <b> utils</b></i> contiene i file utilizzati per la gestione degli eventi.<br>
+            I file che lo compongono sono:
+            <ul>
+                <li> <i><b>audio.js:</b></i> si occupa di attivare e disattivare l'audio. </li>
+                <li> <i><b>fullscreen.js:</b></i> gestisce la modalita' fullscreen.</li>
+                <li> <i><b>handleButton.js:</b></i> gestisce i bottoni interattivi.</li>
+                <li> <i><b>light.js:</b></i> gestisce le luci. </li>
+                <li> <i><b>bump.js:</b></i> gestisce il bump mapping. </li>
+            </ul>
+
+            <p class="subsection" id="js"></a>JS - directory </p>
+            La directory <i> <b> js</b></i> contiene i file utilizzati per il caricamento e la gestione del modello,
+            fondamentale per il funzionamento.<br>
+            I file che lo compongono sono:
+            <ul>
+                <li> <i><b>editObj.js:</b></i> si occupa di modificare le forme e la posizione degli object. </li>
+                <li> <i><b>handleKey.js:</b></i> gestisce gli input da tastiera.</li>
+                <li> <i><b>loadObj.js:</b></i> carica gli obj e gestisce gli mtl di esso.</li>
+                <li> <i><b>shaders.js:</b></i> contiene i vertex e i fragment shaders . </li>
+                <li> <i><b>tangent.js:</b></i> gestisce le tangenti applicate all'oggetto dei modelli. </li>
+                <li> <i><b>texture.js:</b></i> crea delle semplici texture. </li>
+            </ul>
+
+            <p class="subsection" id="index"></a>Index - file </p>
+            Contiene la funzione <i><b>loadModel</b></i> che si occupa dell'intera gestione e del rendering degli
+            oggetti, richiamando tutte le funzioni utili
+            definite nella cartella <i><b>js</b></i>. Riassumendo si occupa di:
+            <ul>
+                <li>Inizializzazione del contesto WebGL</li>
+                <li>Compilazione e collegamento degli shader</li>
+                <li>Caricamento e parsing del modello OBJ</li>
+                <li>Creazione di texture predefinite</li>
+                <li>Caricamento delle texture per i materiali</li>
+                <li>Preparazione dei materiali e delle geometrie</li>
+                <li>Calcolo delle estensioni del modello</li>
+                <li>Funzione di rendering</li>
+                <li>Avvio del rendering continuo</li>
+            </ul>
+            In sostanza, loadModel gestisce l'intero processo di caricamento dei modelli 3D, l'applicazione dei materiali e delle texture, e il rendering continuo dei modelli.
+
+            <p class="subsection" id="feature"></a>Feature opzionali </p>
+            Nell'interfaccia sono presenti anche altre feature opzionali, come ad esempio la modalita' fullscreen, per
+            entrare a pieno nel canvas, e l'audio per un atmosfera differente.
+            E' possibile attivare e disattivare le luci per visualizzare gli oggetti senza colori.
+
+            <h2 id="rendering_avanzato">Rendering avanzato </h2>
+            La tecnica di rending avanzato è il bump mapping che utilizza una normal texture, attivabile tramite il bottone <i><b>Bump</b></i>. <br>
+            Alla texture che ricopre l'oggetto viene "sovrapposta" una seconda texture che il motore di rendering
+            utilizza per simulare sporgenze.
+            Quando la luce colpisce la superficie durante il processo di rendering,
+            si tiene conto delle informazioni fornite per calcolare in modo realistico la riflessione della luce sulla
+            superficie.
+            <br>
+
+            <p class="img"><img src="img/bump.png" alt="bump_mapping" style="width:900px;height:500px;" class="img">
+                <b>Rendering con bump mapping</b></p>
+
+            <p class="subsection" id="riferimenti"></a>Riferimenti </p>
+            <a href="https://webglfundamentals.org/webgl/lessons/webgl-load-obj-w-mtl.html">WebGL Fundamentals: Loading
+                .obj
+                with Mtl</a>
+            <br>
+            <p><a href="#indice">Torna all’indice</a></p>
+
+        </div>
     </div>
 </body>
 

@@ -30,11 +30,11 @@
       Computer Graphics
     </div>
     <div class="flex flex-1 md:flex-row justify-center  flex-col">
-      <div style="flex: 1 0 75%" class="flex h-4/6 flex-col">
-        <!-- <div id="loadingText" class="text-3xl flex flex-1 justify-center p-3 font-bold text-zinc-50 border-b-2">
+      <div style="flex: 1 0 75%" id="canvasdiv" style="display: none;" class="flex h-4/6 flex-col">
+        <div id="loadingText" class="text-3xl flex flex-1 justify-center p-3 font-bold text-zinc-50 border-b-2">
         Caricamento...
-      </div>  style="display: none;" -->
-        <canvas id="canvas" id="canvasContainer" class=" w-full h-4/6 rounded-lg">
+      </div>  
+        <canvas id="canvas"  id="canvasContainer" class=" w-full h-4/6 rounded-lg">
         </canvas>
         <div class="flex justify-center gap-5 p-2">
         <button class="bg-blue-500 w-1/4 hover:bg-blue-700 text-white font-bold py-2 rounded" id="fullscreenButton">
@@ -111,9 +111,9 @@
         </div>
       </div>
     </div>
-    <div class="flex flex-1 justify-center p-5 text-zinc-50 border-t-2">
+    <!-- <div class="flex flex-1 justify-center p-5 text-zinc-50 border-t-2">
       Developed By Man - 2024
-    </div>
+    </div> -->
   </div>
 
   <!-- SHADERS BOX -->
@@ -139,11 +139,10 @@
       }
     </script>
 
-      <!-- WEBGL LIB -->
-      <script src="https://webglfundamentals.org/webgl/resources/webgl-utils.js"></script>
-      <script src="https://webglfundamentals.org/webgl/resources/m4.js"></script>
-      <script src="https://webglfundamentals.org/webgl/resources/m3.js"></script>
-      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <!-- WEBGL LIB -->
+  <script src="libs/webgl-utils.js"></script>
+  <script src="libs/m4.js"></script>
+  <script src="libs/m3.js"></script>
   <!-- EXTERNAL CODE JS -->
   <script src="js/shaders.js"></script>
   <script src="js/loadObj.js"></script>

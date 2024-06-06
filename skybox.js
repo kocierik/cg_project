@@ -89,19 +89,12 @@ const faceInfos = [
   gl.generateMipmap(gl.TEXTURE_CUBE_MAP);
   gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
 
-  function radToDeg(r) {
-    return r * 180 / Math.PI;
-  }
 
   function degToRad(d) {
     return d * Math.PI / 180;
   }
 
   var fieldOfViewRadians = degToRad(60);
-  var cameraYRotationRadians = degToRad(0);
-
-  var spinCamera = true;
-  // Get the starting time.
   var then = 0;
 
   requestAnimationFrame(drawScene);

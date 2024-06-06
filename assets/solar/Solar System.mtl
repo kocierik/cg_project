@@ -1,133 +1,123 @@
-# Blender MTL File: 'Solar System.blend'
-# Material Count: 11
+# Blender 4.1.1 MTL File: 'None'
+# www.blender.org
 
 newmtl Material.001
-Ns 323.999994
 Ka 1.000000 1.000000 1.000000
-Kd 1.800000 1.800000 1.800000
-Ks 0 0 0
+Ks 0.000000 0.000000 0.000000
 Ke 0.000000 0.000000 0.000000
 Ni 1.000000
 d 1.000000
 illum 1
 map_Kd 8k_sun.jpg
-map_Bump bump.jpg
 map_Ns profilecv.jpg
+map_Bump bump.jpg
 
 newmtl Material.002
-Ns 225.000000
+Ns 224.999985
 Ka 1.000000 1.000000 1.000000
-Kd 0.800000 0.800000 0.800000
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
-illum 1
+illum 2
 map_Kd merkur.jpg
 map_Bump bump.jpg
 
 newmtl Material.003
-Ns 225.000000
+Ns 224.999985
 Ka 1.000000 1.000000 1.000000
-Kd 0.800000 0.800000 0.800000
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
-illum 1
+illum 2
 map_Kd venus.jpg
 map_Bump bump.jpg
 
 newmtl Material.004
-Ns 225.000000
+Ns 224.999985
 Ka 1.000000 1.000000 1.000000
-Kd 0.800000 0.800000 0.800000
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
-illum 1
+illum 2
 map_Kd earth.jpg
 map_Bump bump.jpg
 
 newmtl Material.005
-Ns 225.000000
+Ns 224.999985
 Ka 1.000000 1.000000 1.000000
-Kd 0.800000 0.800000 0.800000
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
-illum 1
+illum 2
 map_Kd Mars.jpg
 map_Bump bump.jpg
 
 newmtl Material.006
-Ns 225.000000
+Ns 224.999985
 Ka 1.000000 1.000000 1.000000
-Kd 0.800000 0.800000 0.800000
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
-illum 1
+illum 2
 map_Kd fede.jpeg
 map_Bump bump.jpg
 
 newmtl Material.007
-Ns 225.000000
+Ns 224.999985
 Ka 1.000000 1.000000 1.000000
-Kd 0.800000 0.800000 0.800000
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
-illum 1
-map_Kd 8k_jupiter.jpg
+illum 2
+map_Kd Moon.jpg
 map_Bump bump.jpg
 
 newmtl Material.008
-Ns 225.000000
+Ns 224.999985
 Ka 1.000000 1.000000 1.000000
-Kd 0.800000 0.800000 0.800000
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
-illum 1
+illum 2
 map_Kd 8k_saturn.jpg
 map_Bump bump.jpg
 
 newmtl Material.009
-Ns 225.000000
+Ns 224.999985
 Ka 1.000000 1.000000 1.000000
-Kd 0.800000 0.800000 0.800000
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
-illum 1
+illum 2
 map_Kd uranus.jpg
 map_Bump bump.jpg
 
 newmtl Material.010
-Ns 225.000000
+Ns 224.999985
 Ka 1.000000 1.000000 1.000000
-Kd 0.800000 0.800000 0.800000
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
-illum 1
+illum 2
 map_Kd Neptune.jpg
 map_Bump bump.jpg
 
 newmtl None
-Ns 500
-Ka 0.8 0.8 0.8
-Kd 0.8 0.8 0.8
-Ks 0 0 0
-d 1
+Ns 499.999969
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
 illum 1
 map_Kd Moon.jpg
 map_Bump bump.jpg
