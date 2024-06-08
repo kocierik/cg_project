@@ -115,10 +115,10 @@ if (keys['arrowright']) {
 }
 // Increase velocity
 if (keys['plus'] || keys['+']) {
-  velocity += 1;
+  velocity += 0.2;
 }
 // Decrease velocity
 if (keys['minus'] || keys['-']) {
-  velocity--;
+  velocity -= 0.2;
 }
 }
